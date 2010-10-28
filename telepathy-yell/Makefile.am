@@ -9,7 +9,12 @@ EXTRA_DIST = \
     call.xml \
     all.xml
 
+if ENABLE_SHARED_LIBRARY
+lib_LTLIBRARIES = libtelepathy-yell.la
+else
 noinst_LTLIBRARIES = libtelepathy-yell.la
+libtelepathy_yell_la_LDFLAGS = -static
+endif
 
 libtelepathy_yell_la_LIBADD = $(ALL_LIBS)
 
