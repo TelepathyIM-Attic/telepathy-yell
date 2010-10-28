@@ -21,7 +21,11 @@ libtelepathy_yell_la_LDFLAGS = -static
 libtelepathy_yell_la_LIBADD = $(ALL_LIBS)
 
 pkginclude_HEADERS = \
-    extensions.h
+    extensions.h \
+    gtypes.h \
+    enums.h \
+    interfaces.h \
+    svc-call.h
 
 libtelepathy_yell_la_SOURCES = \
     extensions.c \
