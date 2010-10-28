@@ -15,9 +15,8 @@ EXTRA_DIST = \
     call.xml \
     all.xml
 
-lib_LTLIBRARIES = libtelepathy-yell.la
+noinst_LTLIBRARIES = libtelepathy-yell.la
 
-libtelepathy_yell_la_LDFLAGS = -static
 libtelepathy_yell_la_LIBADD = $(ALL_LIBS)
 
 pkginclude_HEADERS = \
