@@ -1,9 +1,3 @@
-pkgincludedir = $(includedir)/telepathy-1.0/telepathy-yell
-genincludedir = $(pkgincludedir)/_gen
-
-pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = telepathy-yell.pc
-
 EXTRA_DIST = \
     Call_Content_Codec_Offer.xml \
     Call_Content_Interface_Media.xml \
@@ -19,39 +13,37 @@ noinst_LTLIBRARIES = libtelepathy-yell.la
 
 libtelepathy_yell_la_LIBADD = $(ALL_LIBS)
 
-pkginclude_HEADERS = \
-    extensions.h \
-    gtypes.h \
-    enums.h \
-    interfaces.h \
-    svc-call.h
-
 libtelepathy_yell_la_SOURCES = \
     extensions.c \
     extensions-cli.c
 
-nodist_libtelepathy_yell_la_SOURCES = \
+codegen_sources = \
     _gen/signals-marshal.c \
     _gen/signals-marshal.h \
-    _gen/signals-marshal.list \
     _gen/register-dbus-glib-marshallers-body.h \
     _gen/gtypes-body.h \
     _gen/interfaces-body.h \
     _gen/cli-call-body.h \
-    _gen/svc-call.c
-
-nodist_geninclude_HEADERS = \
+    _gen/svc-call.c \
     _gen/enums.h \
     _gen/gtypes.h \
     _gen/interfaces.h \
     _gen/cli-call.h \
     _gen/svc-call.h
 
+nodist_libtelepathy_yell_la_SOURCES = \
+    $(codegen_sources) \
+    extensions.h \
+    gtypes.h \
+    enums.h \
+    interfaces.h \
+    svc-call.h
+
 BUILT_SOURCES = \
     _gen/all.xml \
     _gen/call.xml \
-    $(nodist_geninclude_HEADERS) \
-    $(nodist_libtelepathy_yell_la_SOURCES) \
+    _gen/signals-marshal.list \
+    $(codegen_sources) \
     extensions.html
 
 CLEANFILES = $(BUILT_SOURCES)
