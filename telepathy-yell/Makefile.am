@@ -11,8 +11,9 @@ EXTRA_DIST = \
     Call_Stream_Endpoint.xml \
     Call_Stream_Interface_Media.xml \
     Call_Stream.xml \
-    Channel_Type_call.xml \
-    call.xml
+    Channel_Type_Call.xml \
+    call.xml \
+    all.xml
 
 lib_LTLIBRARIES = libtelepathy-yell.la
 
