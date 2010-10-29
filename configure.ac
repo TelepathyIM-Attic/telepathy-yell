@@ -26,7 +26,7 @@ AC_INIT([telepathy-yell], [tp_yell_version],
 
 AC_CONFIG_MACRO_DIR([m4])
 
-AM_INIT_AUTOMAKE([1.9 -Wall -Wno-portability foreign])
+AM_INIT_AUTOMAKE([1.11 -Wall -Wno-portability foreign])
 AM_CONFIG_HEADER(config.h)
 
 AM_SILENT_RULES
