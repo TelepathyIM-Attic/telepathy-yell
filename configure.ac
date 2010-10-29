@@ -83,12 +83,13 @@ AC_ARG_ENABLE(coding-style-checks,
 AC_SUBST([ENABLE_CODING_STYLE_CHECKS])
 
 dnl shared library
-AC_ARG_ENABLE(shared-library,
-  AC_HELP_STRING([--enable-shared-library],
-                 [produce a shared library to install]),
-    [enable_shared_library=$enableval], [enable_shared_library=no])
+AC_ARG_ENABLE(library-suffix,
+  AC_HELP_STRING([--enable-library-suffix=foo-0.2],
+                 [produce a shared library to install and give it this suffix]),
+    [LIBRARY_SUFFIX=$enableval], [LIBRARY_SUFFIX=no])
 
-AM_CONDITIONAL(ENABLE_SHARED_LIBRARY, test "x$enable_shared_library" != "xno")
+AM_CONDITIONAL(ENABLE_SHARED_LIBRARY, test "x$LIBRARY_SUFFIX" != "xno")
+AC_SUBST([LIBRARY_SUFFIX])
 
 dnl Check for Glib
 PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.26, gobject-2.0 >= 2.26])

@@ -12,6 +12,7 @@ EXTRA_DIST = \
 
 if ENABLE_SHARED_LIBRARY
 lib_LTLIBRARIES = libtelepathy-yell.la
+libtelepathy_yell_la_LDFLAGS = -release $(LIBRARY_SUFFIX)
 else
 noinst_LTLIBRARIES = libtelepathy-yell.la
 libtelepathy_yell_la_LDFLAGS = -static
