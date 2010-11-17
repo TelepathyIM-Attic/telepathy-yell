@@ -21,6 +21,10 @@ endif
 libtelepathy_yell_la_LIBADD = $(ALL_LIBS)
 
 libtelepathy_yell_la_SOURCES = \
+    call-content-codecoffer.h \
+    call-content-codecoffer.c \
+    debug.h \
+    debug.c \
     extensions.c \
     extensions-cli.c
 
