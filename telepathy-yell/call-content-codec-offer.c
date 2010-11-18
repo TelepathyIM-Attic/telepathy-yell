@@ -58,6 +58,7 @@ struct _TpyCallContentCodecOfferPrivate
 {
   gboolean dispose_has_run;
 
+  TpDBusDaemon *bus;
   gchar *object_path;
 
   TpHandle contact;
@@ -80,6 +81,7 @@ tpy_call_content_codec_offer_init (TpyCallContentCodecOffer *self)
       TpyCallContentCodecOfferPrivate);
 
   self->priv = priv;
+  priv->bus = tp_dbus_daemon_dup (NULL);
 }
 
 static void tpy_call_content_codec_offer_dispose (GObject *object);
@@ -238,6 +240,9 @@ tpy_call_content_codec_offer_dispose (GObject *object)
     }
   priv->codecs = NULL;
 
+  g_object_unref (priv->bus);
+  priv->bus = NULL;
+
   /* release any references held by the object here */
   if (G_OBJECT_CLASS (tpy_call_content_codec_offer_parent_class)->dispose)
     G_OBJECT_CLASS (tpy_call_content_codec_offer_parent_class)->dispose (
@@ -264,7 +269,8 @@ tpy_call_content_codec_offer_accept (TpySvcCallContentCodecOffer *iface,
 {
   TpyCallContentCodecOffer *self = TPY_CALL_CONTENT_CODEC_OFFER (iface);
   TpyCallContentCodecOfferPrivate *priv = self->priv;
-  DBusGConnection *bus = tp_get_bus ();
+
+  g_return_if_fail (priv->bus != NULL);
 
   DEBUG ("%s was accepted", priv->object_path);
 
@@ -284,7 +290,7 @@ tpy_call_content_codec_offer_accept (TpySvcCallContentCodecOffer *iface,
 
   tpy_svc_call_content_codec_offer_return_from_accept (context);
 
-  dbus_g_connection_unregister_g_object (bus, G_OBJECT (self));
+  tp_dbus_daemon_unregister_object (priv->bus, G_OBJECT (self));
 }
 
 static void
@@ -293,7 +299,8 @@ tpy_call_content_codec_offer_reject (TpySvcCallContentCodecOffer *iface,
 {
   TpyCallContentCodecOffer *self = TPY_CALL_CONTENT_CODEC_OFFER (iface);
   TpyCallContentCodecOfferPrivate *priv = self->priv;
-  DBusGConnection *bus = tp_get_bus ();
+
+  g_return_if_fail (priv->bus != NULL);
 
   DEBUG ("%s was rejected", priv->object_path);
 
@@ -313,7 +320,7 @@ tpy_call_content_codec_offer_reject (TpySvcCallContentCodecOffer *iface,
 
   tpy_svc_call_content_codec_offer_return_from_reject (context);
 
-  dbus_g_connection_unregister_g_object (bus, G_OBJECT (self));
+  tp_dbus_daemon_unregister_object (priv->bus, G_OBJECT (self));
 }
 
 static void
@@ -346,9 +353,10 @@ cancelled_cb (GCancellable *cancellable, gpointer user_data)
 {
   TpyCallContentCodecOffer *offer = user_data;
   TpyCallContentCodecOfferPrivate *priv = offer->priv;
-  DBusGConnection *bus = tp_get_bus ();
 
-  dbus_g_connection_unregister_g_object (bus, G_OBJECT (offer));
+  g_return_if_fail (priv->bus != NULL);
+
+  tp_dbus_daemon_unregister_object (priv->bus, G_OBJECT (offer));
 
   g_simple_async_result_set_error (priv->result,
       G_IO_ERROR, G_IO_ERROR_CANCELLED, "Offer cancelled");
@@ -368,7 +376,8 @@ tpy_call_content_codec_offer_offer (TpyCallContentCodecOffer *offer,
   gpointer user_data)
 {
   TpyCallContentCodecOfferPrivate *priv = offer->priv;
-  DBusGConnection *bus;
+
+  g_return_if_fail (priv->bus != NULL);
 
   /* FIXME implement cancellable support */
   if (G_UNLIKELY (priv->result != NULL))
@@ -378,9 +387,8 @@ tpy_call_content_codec_offer_offer (TpyCallContentCodecOffer *offer,
     callback, user_data, tpy_call_content_codec_offer_offer_finish);
 
   /* register object on the bus */
-  bus = tp_get_bus ();
   DEBUG ("Registering %s", priv->object_path);
-  dbus_g_connection_register_g_object (bus, priv->object_path,
+  tp_dbus_daemon_register_object (priv->bus, priv->object_path,
     G_OBJECT (offer));
 
   if (cancellable != NULL)
