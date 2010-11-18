@@ -1,5 +1,5 @@
 /*
- * call-content-codecoffer.c - Source for TpyCallContentCodecoffer
+ * call-content-codec-offer.c - Source for TpyCallContentCodecOffer
  * Copyright (C) 2009 Collabora Ltd.
  * @author Sjoerd Simons <sjoerd.simons@collabora.co.uk>
  *
@@ -27,19 +27,19 @@
 #include <telepathy-glib/dbus-properties-mixin.h>
 #include <telepathy-glib/svc-properties-interface.h>
 
-#include "call-content-codecoffer.h"
+#include "call-content-codec-offer.h"
 #include "extensions.h"
 
 #define DEBUG_FLAG TPY_DEBUG_CALL
 #include "debug.h"
 
-static void call_content_codecoffer_iface_init (gpointer, gpointer);
+static void call_content_codec_offer_iface_init (gpointer, gpointer);
 
-G_DEFINE_TYPE_WITH_CODE(TpyCallContentCodecoffer,
-  tpy_call_content_codecoffer,
+G_DEFINE_TYPE_WITH_CODE(TpyCallContentCodecOffer,
+  tpy_call_content_codec_offer,
   G_TYPE_OBJECT,
   G_IMPLEMENT_INTERFACE (TPY_TYPE_SVC_CALL_CONTENT_CODEC_OFFER,
-        call_content_codecoffer_iface_init);
+        call_content_codec_offer_iface_init);
    G_IMPLEMENT_INTERFACE (TP_TYPE_SVC_DBUS_PROPERTIES,
     tp_dbus_properties_mixin_iface_init);
   );
@@ -54,7 +54,7 @@ enum
 };
 
 /* private structure */
-struct _TpyCallContentCodecofferPrivate
+struct _TpyCallContentCodecOfferPrivate
 {
   gboolean dispose_has_run;
 
@@ -68,36 +68,36 @@ struct _TpyCallContentCodecofferPrivate
   guint handler_id;
 };
 
-#define TPY_CALL_CONTENT_CODECOFFER_GET_PRIVATE(o) \
+#define TPY_CALL_CONTENT_CODEC_OFFER_GET_PRIVATE(o) \
     (G_TYPE_INSTANCE_GET_PRIVATE ((o), \
-    TPY_TYPE_CALL_CONTENT_CODECOFFER, TpyCallContentCodecofferPrivate))
+    TPY_TYPE_CALL_CONTENT_CODEC_OFFER, TpyCallContentCodecOfferPrivate))
 
 static void
-tpy_call_content_codecoffer_init (TpyCallContentCodecoffer *self)
+tpy_call_content_codec_offer_init (TpyCallContentCodecOffer *self)
 {
-  TpyCallContentCodecofferPrivate *priv = G_TYPE_INSTANCE_GET_PRIVATE (self,
-      TPY_TYPE_CALL_CONTENT_CODECOFFER,
-      TpyCallContentCodecofferPrivate);
+  TpyCallContentCodecOfferPrivate *priv = G_TYPE_INSTANCE_GET_PRIVATE (self,
+      TPY_TYPE_CALL_CONTENT_CODEC_OFFER,
+      TpyCallContentCodecOfferPrivate);
 
   self->priv = priv;
 }
 
-static void tpy_call_content_codecoffer_dispose (GObject *object);
-static void tpy_call_content_codecoffer_finalize (GObject *object);
+static void tpy_call_content_codec_offer_dispose (GObject *object);
+static void tpy_call_content_codec_offer_finalize (GObject *object);
 
 static const gchar *interfaces[] = {
     NULL
 };
 
 static void
-tpy_call_content_codecoffer_get_property (GObject    *object,
+tpy_call_content_codec_offer_get_property (GObject    *object,
     guint       property_id,
     GValue     *value,
     GParamSpec *pspec)
 {
-  TpyCallContentCodecoffer *offer =
-    TPY_CALL_CONTENT_CODECOFFER (object);
-  TpyCallContentCodecofferPrivate *priv = offer->priv;
+  TpyCallContentCodecOffer *offer =
+    TPY_CALL_CONTENT_CODEC_OFFER (object);
+  TpyCallContentCodecOfferPrivate *priv = offer->priv;
 
   switch (property_id)
     {
@@ -120,14 +120,14 @@ tpy_call_content_codecoffer_get_property (GObject    *object,
 }
 
 static void
-tpy_call_content_codecoffer_set_property (GObject *object,
+tpy_call_content_codec_offer_set_property (GObject *object,
     guint property_id,
     const GValue *value,
     GParamSpec *pspec)
 {
-  TpyCallContentCodecoffer *content =
-    TPY_CALL_CONTENT_CODECOFFER (object);
-  TpyCallContentCodecofferPrivate *priv = content->priv;
+  TpyCallContentCodecOffer *content =
+    TPY_CALL_CONTENT_CODEC_OFFER (object);
+  TpyCallContentCodecOfferPrivate *priv = content->priv;
 
   switch (property_id)
     {
@@ -148,14 +148,14 @@ tpy_call_content_codecoffer_set_property (GObject *object,
 }
 
 static void
-tpy_call_content_codecoffer_class_init (
-  TpyCallContentCodecofferClass *tpy_call_content_codecoffer_class)
+tpy_call_content_codec_offer_class_init (
+  TpyCallContentCodecOfferClass *tpy_call_content_codec_offer_class)
 {
   GObjectClass *object_class =
-    G_OBJECT_CLASS (tpy_call_content_codecoffer_class);
+    G_OBJECT_CLASS (tpy_call_content_codec_offer_class);
   GParamSpec *spec;
 
-  static TpDBusPropertiesMixinPropImpl codecoffer_props[] = {
+  static TpDBusPropertiesMixinPropImpl codec_offer_props[] = {
     { "Interfaces", "interfaces", NULL },
     { "RemoteContactCodecs", "remote-contact-codecs", NULL },
     { "RemoteContact", "remote-contact", NULL },
@@ -166,20 +166,20 @@ tpy_call_content_codecoffer_class_init (
       { TPY_IFACE_CALL_CONTENT_CODEC_OFFER,
         tp_dbus_properties_mixin_getter_gobject_properties,
         NULL,
-        codecoffer_props,
+        codec_offer_props,
       },
       { NULL }
   };
 
 
-  g_type_class_add_private (tpy_call_content_codecoffer_class,
-    sizeof (TpyCallContentCodecofferPrivate));
+  g_type_class_add_private (tpy_call_content_codec_offer_class,
+    sizeof (TpyCallContentCodecOfferPrivate));
 
-  object_class->get_property = tpy_call_content_codecoffer_get_property;
-  object_class->set_property = tpy_call_content_codecoffer_set_property;
+  object_class->get_property = tpy_call_content_codec_offer_get_property;
+  object_class->set_property = tpy_call_content_codec_offer_set_property;
 
-  object_class->dispose = tpy_call_content_codecoffer_dispose;
-  object_class->finalize = tpy_call_content_codecoffer_finalize;
+  object_class->dispose = tpy_call_content_codec_offer_dispose;
+  object_class->finalize = tpy_call_content_codec_offer_finalize;
 
   spec = g_param_spec_string ("object-path", "D-Bus object path",
       "The D-Bus object path used for this "
@@ -212,17 +212,17 @@ tpy_call_content_codecoffer_class_init (
   g_object_class_install_property (object_class, PROP_REMOTE_CONTACT,
       spec);
 
-  tpy_call_content_codecoffer_class->dbus_props_class.interfaces
+  tpy_call_content_codec_offer_class->dbus_props_class.interfaces
     = prop_interfaces;
   tp_dbus_properties_mixin_class_init (object_class,
-      G_STRUCT_OFFSET (TpyCallContentCodecofferClass, dbus_props_class));
+      G_STRUCT_OFFSET (TpyCallContentCodecOfferClass, dbus_props_class));
 }
 
 void
-tpy_call_content_codecoffer_dispose (GObject *object)
+tpy_call_content_codec_offer_dispose (GObject *object)
 {
-  TpyCallContentCodecoffer *self = TPY_CALL_CONTENT_CODECOFFER (object);
-  TpyCallContentCodecofferPrivate *priv = self->priv;
+  TpyCallContentCodecOffer *self = TPY_CALL_CONTENT_CODEC_OFFER (object);
+  TpyCallContentCodecOfferPrivate *priv = self->priv;
 
   g_assert (priv->result == NULL);
 
@@ -239,21 +239,21 @@ tpy_call_content_codecoffer_dispose (GObject *object)
   priv->codecs = NULL;
 
   /* release any references held by the object here */
-  if (G_OBJECT_CLASS (tpy_call_content_codecoffer_parent_class)->dispose)
-    G_OBJECT_CLASS (tpy_call_content_codecoffer_parent_class)->dispose (
+  if (G_OBJECT_CLASS (tpy_call_content_codec_offer_parent_class)->dispose)
+    G_OBJECT_CLASS (tpy_call_content_codec_offer_parent_class)->dispose (
       object);
 }
 
 void
-tpy_call_content_codecoffer_finalize (GObject *object)
+tpy_call_content_codec_offer_finalize (GObject *object)
 {
-  TpyCallContentCodecoffer *self = TPY_CALL_CONTENT_CODECOFFER (object);
-  TpyCallContentCodecofferPrivate *priv = self->priv;
+  TpyCallContentCodecOffer *self = TPY_CALL_CONTENT_CODEC_OFFER (object);
+  TpyCallContentCodecOfferPrivate *priv = self->priv;
 
   g_free (priv->object_path);
   /* free any data held directly by the object here */
 
-  G_OBJECT_CLASS (tpy_call_content_codecoffer_parent_class)->finalize (
+  G_OBJECT_CLASS (tpy_call_content_codec_offer_parent_class)->finalize (
     object);
 }
 
@@ -262,8 +262,8 @@ tpy_call_content_codec_offer_accept (TpySvcCallContentCodecOffer *iface,
     const GPtrArray *codecs,
     DBusGMethodInvocation *context)
 {
-  TpyCallContentCodecoffer *self = TPY_CALL_CONTENT_CODECOFFER (iface);
-  TpyCallContentCodecofferPrivate *priv = self->priv;
+  TpyCallContentCodecOffer *self = TPY_CALL_CONTENT_CODEC_OFFER (iface);
+  TpyCallContentCodecOfferPrivate *priv = self->priv;
   DBusGConnection *bus = tp_get_bus ();
 
   DEBUG ("%s was accepted", priv->object_path);
@@ -291,8 +291,8 @@ static void
 tpy_call_content_codec_offer_reject (TpySvcCallContentCodecOffer *iface,
     DBusGMethodInvocation *context)
 {
-  TpyCallContentCodecoffer *self = TPY_CALL_CONTENT_CODECOFFER (iface);
-  TpyCallContentCodecofferPrivate *priv = self->priv;
+  TpyCallContentCodecOffer *self = TPY_CALL_CONTENT_CODEC_OFFER (iface);
+  TpyCallContentCodecOfferPrivate *priv = self->priv;
   DBusGConnection *bus = tp_get_bus ();
 
   DEBUG ("%s was rejected", priv->object_path);
@@ -317,7 +317,7 @@ tpy_call_content_codec_offer_reject (TpySvcCallContentCodecOffer *iface,
 }
 
 static void
-call_content_codecoffer_iface_init (gpointer iface, gpointer data)
+call_content_codec_offer_iface_init (gpointer iface, gpointer data)
 {
   TpySvcCallContentCodecOfferClass *klass =
     (TpySvcCallContentCodecOfferClass *) iface;
@@ -329,12 +329,12 @@ call_content_codecoffer_iface_init (gpointer iface, gpointer data)
 #undef IMPLEMENT
 }
 
-TpyCallContentCodecoffer *
-tpy_call_content_codecoffer_new (const gchar *object_path,
+TpyCallContentCodecOffer *
+tpy_call_content_codec_offer_new (const gchar *object_path,
   TpHandle remote_contact,
   GPtrArray *codecs)
 {
-  return g_object_new (TPY_TYPE_CALL_CONTENT_CODECOFFER,
+  return g_object_new (TPY_TYPE_CALL_CONTENT_CODEC_OFFER,
     "object-path", object_path,
     "remote-contact", remote_contact,
     "remote-contact-codecs", codecs,
@@ -344,8 +344,8 @@ tpy_call_content_codecoffer_new (const gchar *object_path,
 static void
 cancelled_cb (GCancellable *cancellable, gpointer user_data)
 {
-  TpyCallContentCodecoffer *offer = user_data;
-  TpyCallContentCodecofferPrivate *priv = offer->priv;
+  TpyCallContentCodecOffer *offer = user_data;
+  TpyCallContentCodecOfferPrivate *priv = offer->priv;
   DBusGConnection *bus = tp_get_bus ();
 
   dbus_g_connection_unregister_g_object (bus, G_OBJECT (offer));
@@ -362,12 +362,12 @@ cancelled_cb (GCancellable *cancellable, gpointer user_data)
 }
 
 void
-tpy_call_content_codecoffer_offer (TpyCallContentCodecoffer *offer,
+tpy_call_content_codec_offer_offer (TpyCallContentCodecOffer *offer,
   GCancellable *cancellable,
   GAsyncReadyCallback callback,
   gpointer user_data)
 {
-  TpyCallContentCodecofferPrivate *priv = offer->priv;
+  TpyCallContentCodecOfferPrivate *priv = offer->priv;
   DBusGConnection *bus;
 
   /* FIXME implement cancellable support */
@@ -375,7 +375,7 @@ tpy_call_content_codecoffer_offer (TpyCallContentCodecoffer *offer,
     goto pending;
 
   priv->result = g_simple_async_result_new (G_OBJECT (offer),
-    callback, user_data, tpy_call_content_codecoffer_offer_finish);
+    callback, user_data, tpy_call_content_codec_offer_offer_finish);
 
   /* register object on the bus */
   bus = tp_get_bus ();
@@ -398,8 +398,8 @@ pending:
 }
 
 GPtrArray *
-tpy_call_content_codecoffer_offer_finish (
-  TpyCallContentCodecoffer *offer,
+tpy_call_content_codec_offer_offer_finish (
+  TpyCallContentCodecOffer *offer,
   GAsyncResult *result,
   GError **error)
 {
@@ -408,7 +408,7 @@ tpy_call_content_codecoffer_offer_finish (
     return FALSE;
 
   g_return_val_if_fail (g_simple_async_result_is_valid (result,
-    G_OBJECT (offer), tpy_call_content_codecoffer_offer_finish),
+    G_OBJECT (offer), tpy_call_content_codec_offer_offer_finish),
     NULL);
 
   return g_simple_async_result_get_op_res_gpointer (
