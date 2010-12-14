@@ -25,6 +25,7 @@ libtelepathy_yell_la_SOURCES = \
     call-content-codec-offer.c \
     debug.h \
     debug.c \
+    extensions.h \
     extensions.c \
     extensions-cli.c
 
