@@ -50,6 +50,7 @@ codegen_headers = \
     _gen/svc-call.h
 
 headers = \
+    telepathy-yell.h \
     extensions.h \
     gtypes.h \
     enums.h \
