@@ -25,6 +25,7 @@
 #include <telepathy-yell/extensions.h>
 #include <telepathy-yell/gtypes.h>
 #include <telepathy-yell/interfaces.h>
+#include <telepathy-yell/cli-call.h>
 #include <telepathy-yell/svc-call.h>
 
 #endif

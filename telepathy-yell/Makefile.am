@@ -55,7 +55,8 @@ headers = \
     gtypes.h \
     enums.h \
     interfaces.h \
-    svc-call.h
+    svc-call.h \
+    cli-call.h
 
 if ENABLE_SHARED_LIBRARY
 tpyinclude_HEADERS = \

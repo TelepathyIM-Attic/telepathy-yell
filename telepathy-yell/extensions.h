@@ -5,14 +5,14 @@
 #include <telepathy-glib/channel.h>
 #include <telepathy-glib/connection.h>
 
-#include <telepathy-yell/_gen/enums.h>
-#include <telepathy-yell/_gen/cli-call.h>
-#include <telepathy-yell/_gen/svc-call.h>
+#include <telepathy-yell/enums.h>
+#include <telepathy-yell/cli-call.h>
+#include <telepathy-yell/svc-call.h>
 
 G_BEGIN_DECLS
 
-#include <telepathy-yell/_gen/gtypes.h>
-#include <telepathy-yell/_gen/interfaces.h>
+#include <telepathy-yell/gtypes.h>
+#include <telepathy-yell/interfaces.h>
 
 void tpy_cli_init (void);
 
