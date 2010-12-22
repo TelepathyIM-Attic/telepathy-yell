@@ -13,6 +13,10 @@ EXTRA_DIST = \
 if ENABLE_SHARED_LIBRARY
 lib_LTLIBRARIES = libtelepathy-yell.la
 libtelepathy_yell_la_LDFLAGS = -release $(LIBRARY_SUFFIX)
+pkgconfigdir = ${libdir}/pkgconfig
+pkgconfig_DATA = telepathy-yell.pc
+tpyincludedir=$(includedir)/telepathy-1.0/telepathy-yell
+genincludedir=$(tpyincludedir)/_gen
 else
 noinst_LTLIBRARIES = libtelepathy-yell.la
 libtelepathy_yell_la_LDFLAGS = -static
@@ -30,26 +34,39 @@ libtelepathy_yell_la_SOURCES = \
     extensions-cli.c
 
 codegen_sources = \
-    _gen/signals-marshal.c \
     _gen/signals-marshal.h \
     _gen/register-dbus-glib-marshallers-body.h \
     _gen/gtypes-body.h \
     _gen/interfaces-body.h \
     _gen/cli-call-body.h \
-    _gen/svc-call.c \
+    _gen/signals-marshal.c \
+    _gen/svc-call.c
+
+codegen_headers = \
     _gen/enums.h \
     _gen/gtypes.h \
     _gen/interfaces.h \
     _gen/cli-call.h \
     _gen/svc-call.h
 
-nodist_libtelepathy_yell_la_SOURCES = \
-    $(codegen_sources) \
+headers = \
     extensions.h \
     gtypes.h \
     enums.h \
     interfaces.h \
     svc-call.h
+
+if ENABLE_SHARED_LIBRARY
+tpyinclude_HEADERS = \
+    $(headers)
+geninclude_HEADERS = \
+    $(codegen_headers)
+endif
+
+nodist_libtelepathy_yell_la_SOURCES = \
+    $(codegen_sources) \
+    $(codegen_headers) \
+    $(headers)
 
 BUILT_SOURCES = \
     _gen/all.xml \
