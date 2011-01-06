@@ -128,5 +128,6 @@ AC_OUTPUT( Makefile \
 	   telepathy-yell/telepathy-yell.pc \
 	   telepathy-yell/telepathy-yell-uninstalled.pc \
 	   tools/Makefile \
+	   spec/Makefile \
 	   m4/Makefile
 )
