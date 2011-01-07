@@ -75,6 +75,7 @@ BUILT_SOURCES = \
     _gen/call.xml \
     _gen/signals-marshal.list \
     $(codegen_sources) \
+    $(codegen_headers) \
     extensions.html
 
 CLEANFILES = $(BUILT_SOURCES)
