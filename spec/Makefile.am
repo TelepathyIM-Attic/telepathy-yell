@@ -1,5 +1,5 @@
 EXTRA_DIST = \
-    Call_Content_Codec_Offer.xml \
+    Call_Content_Media_Description.xml \
     Call_Content_Interface_Media.xml \
     Call_Content_Interface_Mute.xml \
     Call_Content.xml \
