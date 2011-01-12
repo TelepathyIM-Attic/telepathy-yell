@@ -21,6 +21,8 @@ libtelepathy_yell_la_SOURCES = \
     base-call-stream.h \
     base-call-content.c \
     base-call-content.h \
+    base-media-call-stream.h \
+    base-media-call-stream.c \
     call-stream-endpoint.h \
     call-stream-endpoint.c \
     call-content-codec-offer.h \
