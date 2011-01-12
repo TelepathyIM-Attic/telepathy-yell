@@ -28,13 +28,13 @@
 #include <telepathy-yell/gtypes.h>
 #include <telepathy-yell/svc-call.h>
 
+static void call_stream_iface_init (gpointer g_iface, gpointer iface_data);
+
 G_DEFINE_TYPE_WITH_CODE(TpyBaseCallStream, tpy_base_call_stream,
     G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (TP_TYPE_SVC_DBUS_PROPERTIES,
         tp_dbus_properties_mixin_iface_init);
-    /* The base class doesn't implement SetSending or RequestReceiving, because
-     * they're pretty protocol-specific. It just implements the properties. */
-    G_IMPLEMENT_INTERFACE (TPY_TYPE_SVC_CALL_STREAM, NULL);
+    G_IMPLEMENT_INTERFACE (TPY_TYPE_SVC_CALL_STREAM, call_stream_iface_init);
     )
 
 enum
@@ -146,9 +146,13 @@ tpy_base_call_stream_get_property (
         g_value_set_uint (value, priv->local_sending_state);
         break;
       case PROP_CAN_REQUEST_RECEIVING:
-        /* TODO: set to TRUE conditionally when RequestReceiving is implemented */
-        g_value_set_boolean (value, FALSE);
-        break;
+        {
+          TpyBaseCallStreamClass *klass =
+              TPY_BASE_CALL_STREAM_GET_CLASS (self);
+
+          g_value_set_boolean (value, klass->request_receiving != NULL);
+          break;
+        }
       case PROP_INTERFACES:
         {
           TpyBaseCallStreamClass *klass =
@@ -339,4 +343,64 @@ tpy_base_call_stream_update_local_sending_state (TpyBaseCallStream *self,
   priv->local_sending_state = state;
 
   return TRUE;
+}
+
+static void
+tpy_base_call_stream_set_sending (TpySvcCallStream *iface,
+    gboolean sending,
+    DBusGMethodInvocation *context)
+{
+  GError *error = NULL;
+  TpyBaseCallStream *self = TPY_BASE_CALL_STREAM (iface);
+  TpyBaseCallStreamClass *klass = TPY_BASE_CALL_STREAM_GET_CLASS (self);
+
+  if (klass->set_sending != NULL)
+    klass->set_sending (self, sending, &error);
+  else
+    g_set_error_literal (&error, TP_ERRORS, TP_ERROR_NOT_IMPLEMENTED,
+        "This CM does not implement set_sending");
+
+  if (error != NULL)
+    dbus_g_method_return_error (context, error);
+  else
+    tpy_svc_call_stream_return_from_set_sending (context);
+
+  g_clear_error (&error);
+}
+
+static void
+tpy_base_call_stream_request_receiving (TpySvcCallStream *iface,
+    TpHandle handle,
+    gboolean receiving,
+    DBusGMethodInvocation *context)
+{
+  GError *error = NULL;
+  TpyBaseCallStream *self = TPY_BASE_CALL_STREAM (iface);
+  TpyBaseCallStreamClass *klass = TPY_BASE_CALL_STREAM_GET_CLASS (self);
+
+  if (klass->request_receiving != NULL)
+    klass->request_receiving (self, handle, receiving, &error);
+  else
+    g_set_error_literal (&error, TP_ERRORS, TP_ERROR_NOT_IMPLEMENTED,
+        "This CM does not implement request_receiving");
+
+  if (error != NULL)
+    dbus_g_method_return_error (context, error);
+  else
+    tpy_svc_call_stream_return_from_request_receiving (context);
+
+  g_clear_error (&error);
+}
+
+static void
+call_stream_iface_init (gpointer g_iface, gpointer iface_data)
+{
+  TpySvcCallStreamClass *klass =
+    (TpySvcCallStreamClass *) g_iface;
+
+#define IMPLEMENT(x) tpy_svc_call_stream_implement_##x (\
+    klass, tpy_base_call_stream_##x)
+  IMPLEMENT(set_sending);
+  IMPLEMENT(request_receiving);
+#undef IMPLEMENT
 }

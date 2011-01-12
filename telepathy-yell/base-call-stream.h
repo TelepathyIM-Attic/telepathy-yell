@@ -34,10 +34,21 @@ typedef struct _TpyBaseCallStream TpyBaseCallStream;
 typedef struct _TpyBaseCallStreamPrivate TpyBaseCallStreamPrivate;
 typedef struct _TpyBaseCallStreamClass TpyBaseCallStreamClass;
 
+typedef void (*TpyStreamSetSendingFunc) (TpyBaseCallStream *,
+    gboolean,
+    GError **);
+typedef void (*TpyStreamRequestReceivingFunc) (TpyBaseCallStream *,
+    TpHandle,
+    gboolean,
+    GError **);
+
 struct _TpyBaseCallStreamClass {
     GObjectClass parent_class;
 
     TpDBusPropertiesMixinClass dbus_props_class;
+
+    TpyStreamRequestReceivingFunc request_receiving;
+    TpyStreamSetSendingFunc set_sending;
 
     const gchar * const *extra_interfaces;
 };
