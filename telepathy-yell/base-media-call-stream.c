@@ -242,17 +242,21 @@ tpy_base_media_call_stream_constructed (GObject *obj)
 {
   TpyBaseMediaCallStreamClass *klass =
       TPY_BASE_MEDIA_CALL_STREAM_GET_CLASS (obj);
+  GObjectClass *g_klass = G_OBJECT_CLASS (
+    tpy_base_media_call_stream_parent_class);
 
-  if (G_OBJECT_CLASS (tpy_base_media_call_stream_parent_class)->constructed != NULL)
-    G_OBJECT_CLASS (tpy_base_media_call_stream_parent_class)->constructed (obj);
+  if (g_klass->constructed != NULL)
+      g_klass->constructed (obj);
 
   g_return_if_fail (klass->add_local_candidates != NULL);
 }
 
 static void
-tpy_base_media_call_stream_class_init (TpyBaseMediaCallStreamClass *tpy_base_media_call_stream_class)
+tpy_base_media_call_stream_class_init (
+    TpyBaseMediaCallStreamClass *tpy_base_media_call_stream_class)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (tpy_base_media_call_stream_class);
+  GObjectClass *object_class =
+    G_OBJECT_CLASS (tpy_base_media_call_stream_class);
   GParamSpec *param_spec;
   TpyBaseCallStreamClass *bcs_class =
       TPY_BASE_CALL_STREAM_CLASS (tpy_base_media_call_stream_class);
@@ -372,7 +376,8 @@ tpy_base_media_call_stream_finalize (GObject *object)
 }
 
 static void
-tpy_base_media_call_stream_add_candidates (TpySvcCallStreamInterfaceMedia *iface,
+tpy_base_media_call_stream_add_candidates (
+    TpySvcCallStreamInterfaceMedia *iface,
     const GPtrArray *candidates,
     DBusGMethodInvocation *context)
 {
