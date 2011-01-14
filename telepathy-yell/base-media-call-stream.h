@@ -31,7 +31,7 @@ G_BEGIN_DECLS
 typedef struct _TpyBaseMediaCallStream TpyBaseMediaCallStream;
 typedef struct _TpyBaseMediaCallStreamPrivate TpyBaseMediaCallStreamPrivate;
 typedef struct _TpyBaseMediaCallStreamClass TpyBaseMediaCallStreamClass;
-typedef GPtrArray *(*TpyMediaStreamGetPtrArrayFunc) (TpyBaseMediaCallStream *);
+typedef void (*TpyBaseMediaStreamFunc) (TpyBaseMediaCallStream *);
 typedef GPtrArray *(*TpyMediaStreamAddCandidatesFunc) (TpyBaseMediaCallStream *,
     const GPtrArray *,
     GError **);
@@ -40,6 +40,7 @@ struct _TpyBaseMediaCallStreamClass {
     TpyBaseCallStreamClass parent_class;
 
     TpyMediaStreamAddCandidatesFunc add_local_candidates;
+    TpyBaseMediaStreamFunc local_candidates_prepared;
 };
 
 struct _TpyBaseMediaCallStream {

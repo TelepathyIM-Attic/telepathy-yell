@@ -430,6 +430,13 @@ tpy_base_media_call_stream_candidates_prepared (
     TpySvcCallStreamInterfaceMedia *iface,
     DBusGMethodInvocation *context)
 {
+  TpyBaseMediaCallStream *self = TPY_BASE_MEDIA_CALL_STREAM (iface);
+  TpyBaseMediaCallStreamClass *klass =
+      TPY_BASE_MEDIA_CALL_STREAM_GET_CLASS (self);
+
+  if (klass->local_candidates_prepared != NULL)
+    klass->local_candidates_prepared (self);
+
   tpy_svc_call_stream_interface_media_return_from_candidates_prepared (
     context);
 }
