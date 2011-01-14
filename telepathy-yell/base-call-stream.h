@@ -35,12 +35,12 @@ typedef struct _TpyBaseCallStreamPrivate TpyBaseCallStreamPrivate;
 typedef struct _TpyBaseCallStreamClass TpyBaseCallStreamClass;
 
 typedef void (*TpyStreamSetSendingFunc) (TpyBaseCallStream *,
-    gboolean,
-    GError **);
-typedef void (*TpyStreamRequestReceivingFunc) (TpyBaseCallStream *,
-    TpHandle,
-    gboolean,
-    GError **);
+    gboolean sending,
+    GError **error);
+typedef void (*TpyStreamRequestReceivingFunc) (TpyBaseCallStream *self,
+    TpHandle handle,
+    gboolean receive,
+    GError **error);
 
 struct _TpyBaseCallStreamClass {
     GObjectClass parent_class;

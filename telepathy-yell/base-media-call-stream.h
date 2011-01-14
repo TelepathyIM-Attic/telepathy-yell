@@ -31,10 +31,11 @@ G_BEGIN_DECLS
 typedef struct _TpyBaseMediaCallStream TpyBaseMediaCallStream;
 typedef struct _TpyBaseMediaCallStreamPrivate TpyBaseMediaCallStreamPrivate;
 typedef struct _TpyBaseMediaCallStreamClass TpyBaseMediaCallStreamClass;
-typedef void (*TpyBaseMediaStreamFunc) (TpyBaseMediaCallStream *);
-typedef GPtrArray *(*TpyMediaStreamAddCandidatesFunc) (TpyBaseMediaCallStream *,
-    const GPtrArray *,
-    GError **);
+typedef void (*TpyBaseMediaStreamFunc) (TpyBaseMediaCallStream *self);
+typedef GPtrArray *(*TpyMediaStreamAddCandidatesFunc) (
+    TpyBaseMediaCallStream *self,
+    const GPtrArray *candidates,
+    GError **error);
 
 struct _TpyBaseMediaCallStreamClass {
     TpyBaseCallStreamClass parent_class;
