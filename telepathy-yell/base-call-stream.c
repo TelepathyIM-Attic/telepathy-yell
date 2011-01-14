@@ -358,7 +358,7 @@ tpy_base_call_stream_set_sending (TpySvcCallStream *iface,
     klass->set_sending (self, sending, &error);
   else
     g_set_error_literal (&error, TP_ERRORS, TP_ERROR_NOT_IMPLEMENTED,
-        "This CM does not implement set_sending");
+        "This CM does not implement SetSending");
 
   if (error != NULL)
     dbus_g_method_return_error (context, error);
