@@ -59,17 +59,6 @@ enum
   PROP_HAS_SERVER_INFO,
 };
 
-#if 0
-/* signal enum */
-enum
-{
-    LAST_SIGNAL
-};
-
-static guint signals[LAST_SIGNAL] = {0};
-#endif
-
-
 /* private structure */
 struct _TpyBaseMediaCallStreamPrivate
 {
