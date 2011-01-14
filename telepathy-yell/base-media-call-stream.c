@@ -137,7 +137,7 @@ tpy_base_media_call_stream_get_property (GObject    *object,
         }
       case PROP_STUN_SERVERS:
         {
-          g_value_take_boxed (value, priv->stun_servers);
+          g_value_set_boxed (value, priv->stun_servers);
           break;
         }
       case PROP_RELAY_INFO:
