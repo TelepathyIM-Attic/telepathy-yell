@@ -34,7 +34,7 @@ typedef struct _TpyBaseCallStream TpyBaseCallStream;
 typedef struct _TpyBaseCallStreamPrivate TpyBaseCallStreamPrivate;
 typedef struct _TpyBaseCallStreamClass TpyBaseCallStreamClass;
 
-typedef void (*TpyStreamSetSendingFunc) (TpyBaseCallStream *,
+typedef gboolean (*TpyStreamSetSendingFunc) (TpyBaseCallStream *,
     gboolean sending,
     GError **error);
 typedef void (*TpyStreamRequestReceivingFunc) (TpyBaseCallStream *self,
@@ -106,6 +106,9 @@ gboolean tpy_base_call_stream_update_senders (
     TpHandle contact,
     TpySendingState state,
     ...) G_GNUC_NULL_TERMINATED;
+
+gboolean tpy_base_call_stream_set_sending (TpyBaseCallStream *self,
+    gboolean send, GError **error);
 
 G_END_DECLS
 

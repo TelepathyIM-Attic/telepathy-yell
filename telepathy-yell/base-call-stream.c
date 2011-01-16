@@ -346,25 +346,64 @@ tpy_base_call_stream_update_local_sending_state (TpyBaseCallStream *self,
   return TRUE;
 }
 
+gboolean
+tpy_base_call_stream_set_sending (TpyBaseCallStream *self,
+  gboolean send,
+  GError **error)
+{
+  TpyBaseCallStreamPrivate *priv = self->priv;
+  TpyBaseCallStreamClass *klass = TPY_BASE_CALL_STREAM_GET_CLASS (self);
+
+  /* Determine if there is a state change for our sending side */
+  switch (priv->local_sending_state)
+    {
+      case TPY_SENDING_STATE_NONE:
+      case TPY_SENDING_STATE_PENDING_SEND:
+        if (!send)
+          goto out;
+        break;
+      case TPY_SENDING_STATE_SENDING:
+      case TPY_SENDING_STATE_PENDING_STOP_SENDING:
+        if (send)
+          goto out;
+        break;
+      default:
+        g_assert_not_reached ();
+    }
+
+  if (klass->set_sending != NULL)
+    {
+      if (!klass->set_sending (self, send, error))
+        goto failed;
+    }
+  else
+    {
+      g_set_error_literal (error, TP_ERRORS, TP_ERROR_NOT_IMPLEMENTED,
+        "This CM does not implement SetSending");
+      goto failed;
+    }
+
+out:
+  tpy_base_call_stream_update_local_sending_state (self,
+    send ? TPY_SENDING_STATE_SENDING : TPY_SENDING_STATE_NONE);
+  return TRUE;
+
+failed:
+  return FALSE;
+}
+
 static void
-tpy_base_call_stream_set_sending (TpySvcCallStream *iface,
+tpy_base_call_stream_set_sending_dbus (TpySvcCallStream *iface,
     gboolean sending,
     DBusGMethodInvocation *context)
 {
   GError *error = NULL;
-  TpyBaseCallStream *self = TPY_BASE_CALL_STREAM (iface);
-  TpyBaseCallStreamClass *klass = TPY_BASE_CALL_STREAM_GET_CLASS (self);
 
-  if (klass->set_sending != NULL)
-    klass->set_sending (self, sending, &error);
-  else
-    g_set_error_literal (&error, TP_ERRORS, TP_ERROR_NOT_IMPLEMENTED,
-        "This CM does not implement SetSending");
-
-  if (error != NULL)
-    dbus_g_method_return_error (context, error);
-  else
+  if (tpy_base_call_stream_set_sending (TPY_BASE_CALL_STREAM (iface),
+      sending, &error))
     tpy_svc_call_stream_return_from_set_sending (context);
+  else
+    dbus_g_method_return_error (context, error);
 
   g_clear_error (&error);
 }
@@ -399,9 +438,9 @@ call_stream_iface_init (gpointer g_iface, gpointer iface_data)
   TpySvcCallStreamClass *klass =
     (TpySvcCallStreamClass *) g_iface;
 
-#define IMPLEMENT(x) tpy_svc_call_stream_implement_##x (\
-    klass, tpy_base_call_stream_##x)
-  IMPLEMENT(set_sending);
-  IMPLEMENT(request_receiving);
+#define IMPLEMENT(x, suffix) tpy_svc_call_stream_implement_##x (\
+    klass, tpy_base_call_stream_##x##suffix)
+  IMPLEMENT(set_sending, _dbus);
+  IMPLEMENT(request_receiving,);
 #undef IMPLEMENT
 }
