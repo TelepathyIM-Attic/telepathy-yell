@@ -17,6 +17,8 @@ endif
 libtelepathy_yell_la_LIBADD = $(ALL_LIBS)
 
 libtelepathy_yell_la_SOURCES = \
+    base-call-channel.c \
+    base-call-channel.h \
     base-call-stream.c \
     base-call-stream.h \
     base-call-content.c \
