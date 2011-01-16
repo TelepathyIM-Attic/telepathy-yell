@@ -338,9 +338,10 @@ tpy_base_call_stream_update_local_sending_state (TpyBaseCallStream *self,
   if (priv->local_sending_state == state)
     return FALSE;
 
+  priv->local_sending_state = state;
+
   tpy_svc_call_stream_emit_local_sending_state_changed (
     TPY_SVC_CALL_STREAM (self), state);
-  priv->local_sending_state = state;
 
   return TRUE;
 }
