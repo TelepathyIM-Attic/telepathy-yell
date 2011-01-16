@@ -449,3 +449,22 @@ tpy_base_call_content_deinit (TpyBaseCallContent *self)
   g_return_if_fail (klass->deinit != NULL);
   klass->deinit (self);
 }
+
+void
+tpy_base_call_content_accepted (TpyBaseCallContent *self)
+{
+  TpyBaseCallContentPrivate *priv = self->priv;
+  GList *l;
+
+  if (priv->disposition != TPY_CALL_CONTENT_DISPOSITION_INITIAL)
+    return;
+
+  for (l = priv->streams ; l != NULL; l = g_list_next (l))
+    {
+      TpyBaseCallStream *s = TPY_BASE_CALL_STREAM (l->data);
+
+      if (tpy_base_call_stream_get_local_sending_state (s) ==
+          TPY_SENDING_STATE_PENDING_SEND)
+        tpy_base_call_stream_set_sending (s, TRUE, NULL);
+    }
+}

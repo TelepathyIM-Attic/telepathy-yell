@@ -87,6 +87,7 @@ void tpy_base_call_content_add_stream (TpyBaseCallContent *self,
 void tpy_base_call_content_remove_stream (TpyBaseCallContent *self,
     TpyBaseCallStream *stream);
 
+void tpy_base_call_content_accepted (TpyBaseCallContent *self);
 void tpy_base_call_content_deinit (TpyBaseCallContent *self);
 
 G_END_DECLS
