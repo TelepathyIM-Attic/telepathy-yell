@@ -31,15 +31,14 @@
 #include <telepathy-yell/enums.h>
 #include <telepathy-yell/svc-call.h>
 
+static void call_content_iface_init (gpointer g_iface, gpointer iface_data);
+
 G_DEFINE_TYPE_WITH_CODE(TpyBaseCallContent, tpy_base_call_content,
     G_TYPE_OBJECT,
     G_IMPLEMENT_INTERFACE (TP_TYPE_SVC_DBUS_PROPERTIES,
         tp_dbus_properties_mixin_iface_init);
-    /* The base class doesn't implement Remove(), which is pretty
-     * protocol-specific. It just implements the properties.
-     */
     G_IMPLEMENT_INTERFACE (TPY_TYPE_SVC_CALL_CONTENT,
-        NULL);
+        call_content_iface_init);
     );
 
 struct _TpyBaseCallContentPrivate
@@ -467,4 +466,35 @@ tpy_base_call_content_accepted (TpyBaseCallContent *self)
           TPY_SENDING_STATE_PENDING_SEND)
         tpy_base_call_stream_set_sending (s, TRUE, NULL);
     }
+}
+
+static void
+tpy_call_content_remove (TpySvcCallContent *content,
+    TpyContentRemovalReason reason,
+    const gchar *detailed_removal_reason,
+    const gchar *message,
+    DBusGMethodInvocation *context)
+{
+  /* TODO: actually do something with this reason and message. */
+  DEBUG ("removing content for reason %u, dbus error: %s, message: %s",
+      reason, detailed_removal_reason, message);
+
+  tpy_svc_call_content_emit_removed (content);
+  /* it doesn't matter if a ::removed signal handler calls deinit as
+   * there are guards around it being called again and breaking, so
+   * let's just call it be sure it's done. */
+  tpy_base_call_content_deinit (TPY_BASE_CALL_CONTENT (content));
+  tpy_svc_call_content_return_from_remove (context);
+}
+
+static void
+call_content_iface_init (gpointer g_iface, gpointer iface_data)
+{
+  TpySvcCallContentClass *klass =
+    (TpySvcCallContentClass *) g_iface;
+
+#define IMPLEMENT(x) tpy_svc_call_content_implement_##x (\
+    klass, tpy_call_content_##x)
+  IMPLEMENT(remove);
+#undef IMPLEMENT
 }
