@@ -166,13 +166,15 @@ static void
 tpy_base_media_call_content_class_init (
     TpyBaseMediaCallContentClass *tpy_base_media_call_content_class)
 {
-  GObjectClass *object_class = G_OBJECT_CLASS (tpy_base_media_call_content_class);
+  GObjectClass *object_class =
+    G_OBJECT_CLASS (tpy_base_media_call_content_class);
   TpyBaseCallContentClass *bcc_class =
       TPY_BASE_CALL_CONTENT_CLASS (tpy_base_media_call_content_class);
   GParamSpec *param_spec;
   static TpDBusPropertiesMixinPropImpl content_media_props[] = {
     { "ContactCodecMap", "contact-codec-map", NULL },
     { "CodecOffer", "codec-offer", NULL },
+    { "Packetization", "packetization", NULL },
     { NULL }
   };
   static const gchar *interfaces[] = {
