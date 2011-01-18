@@ -307,6 +307,7 @@ tpy_base_call_channel_fill_immutable_properties (
       TPY_IFACE_CHANNEL_TYPE_CALL, "InitialVideo",
       TPY_IFACE_CHANNEL_TYPE_CALL, "InitialVideoName",
       TPY_IFACE_CHANNEL_TYPE_CALL, "MutableContents",
+      TPY_IFACE_CHANNEL_TYPE_CALL, "HardwareStreaming",
       NULL);
 }
 
