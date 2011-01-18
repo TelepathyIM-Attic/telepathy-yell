@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
+#include "base-call-channel.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,8 +41,6 @@
 #include <telepathy-yell/interfaces.h>
 #include <telepathy-yell/svc-call.h>
 #include <telepathy-yell/base-call-content.h>
-
-#include "base-call-channel.h"
 
 #define DEBUG_FLAG TPY_DEBUG_CALL
 #include "debug.h"
