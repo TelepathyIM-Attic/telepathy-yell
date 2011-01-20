@@ -196,6 +196,9 @@ tpy_base_call_stream_set_property (
         g_free (priv->object_path);
         priv->object_path = g_value_dup_string (value);
         break;
+      case PROP_LOCAL_SENDING_STATE:
+        self->priv->local_sending_state = g_value_get_uint (value);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
         break;
@@ -260,8 +263,8 @@ tpy_base_call_stream_class_init (TpyBaseCallStreamClass *bsc_class)
 
   param_spec = g_param_spec_uint ("local-sending-state", "LocalSendingState",
       "Local sending state",
-      0, G_MAXUINT, 0,
-      G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+      0, NUM_TPY_SENDING_STATES, 0,
+      G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
   g_object_class_install_property (object_class, PROP_LOCAL_SENDING_STATE,
       param_spec);
 
@@ -339,6 +342,7 @@ tpy_base_call_stream_update_local_sending_state (TpyBaseCallStream *self,
     return FALSE;
 
   priv->local_sending_state = state;
+  g_object_notify (G_OBJECT (self), "local-sending-state");
 
   tpy_svc_call_stream_emit_local_sending_state_changed (
     TPY_SVC_CALL_STREAM (self), state);
