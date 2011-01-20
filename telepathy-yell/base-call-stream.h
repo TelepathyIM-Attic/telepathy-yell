@@ -95,17 +95,15 @@ TpySendingState
 tpy_base_call_stream_get_local_sending_state (
   TpyBaseCallStream *self);
 
-gboolean
-tpy_base_call_stream_remote_member_update_state (TpyBaseCallStream *self,
-    TpHandle contact,
-    TpySendingState state);
-
-
-gboolean tpy_base_call_stream_update_senders (
+gboolean tpy_base_call_stream_update_remote_member_states (
     TpyBaseCallStream *self,
     TpHandle contact,
     TpySendingState state,
     ...) G_GNUC_NULL_TERMINATED;
+
+gboolean tpy_base_call_stream_remove_member (
+    TpyBaseCallStream *self, 
+    TpHandle removed);
 
 gboolean tpy_base_call_stream_set_sending (TpyBaseCallStream *self,
     gboolean send, GError **error);
