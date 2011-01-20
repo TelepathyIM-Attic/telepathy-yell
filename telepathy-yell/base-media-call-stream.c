@@ -221,6 +221,13 @@ tpy_base_media_call_stream_take_endpoint (
   self->priv->endpoints = g_list_append (self->priv->endpoints, endpoint);
 }
 
+GList *
+tpy_base_media_call_stream_get_endpoints (
+    TpyBaseMediaCallStream *self)
+{
+  return self->priv->endpoints;
+}
+
 void
 tpy_base_media_call_stream_set_stun_servers (TpyBaseMediaCallStream *self,
     const GPtrArray *stun_servers)

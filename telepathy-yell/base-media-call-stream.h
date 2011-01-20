@@ -61,6 +61,8 @@ void tpy_base_media_call_stream_set_stun_servers (
 void tpy_base_media_call_stream_take_endpoint (
     TpyBaseMediaCallStream *self,
     TpyCallStreamEndpoint *endpoint);
+GList *tpy_base_media_call_stream_get_endpoints (
+    TpyBaseMediaCallStream *self);
 void tpy_base_media_call_stream_set_transport (
     TpyBaseMediaCallStream *self,
     TpyStreamTransportType transport);
