@@ -154,7 +154,7 @@ _gen/interfaces-body.h _gen/interfaces.h: _gen/all.xml \
 # subclass you want to use with --subclass will need to have its own category,
 # although you can subdivide further if you want.
 
-_gen/%.xml: %.xml $(wildcard *.xml)
+_gen/%.xml: %.xml $(wildcard ../spec/*.xml)
 	@$(mkdir_p) _gen
 	$(AM_V_GEN)$(XSLTPROC) $(XSLTPROCFLAGS) --xinclude $(tools_dir)/identity.xsl \
 		$< > $@
