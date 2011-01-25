@@ -112,7 +112,7 @@
 
     <tp:enum type="u" name="Stream_Component">
       <tp:docstring xmlns="http://www.w3.org/1999/xhtml">
-        RTP streams can use more than one UDP socket: one for RTP (data)
+        Media streams can use more than one UDP socket: one for RTP (data)
         and one for RTCP (control). Most of the time, they are adjacent
         to each other, but some protocols (xmpp) signal each port separately.
       </tp:docstring>
