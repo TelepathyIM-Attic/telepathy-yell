@@ -76,7 +76,7 @@ void tpy_call_stream_endpoint_add_new_candidates (
     GPtrArray *candidates);
 void tpy_call_stream_endpoint_add_new_candidate (
     TpyCallStreamEndpoint *endpoint,
-    guint component,
+    TpyStreamComponent component,
     const gchar *address,
     guint port,
     const GHashTable *info_hash);
