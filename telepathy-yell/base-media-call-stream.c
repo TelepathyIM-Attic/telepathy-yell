@@ -52,6 +52,7 @@ G_DEFINE_TYPE_WITH_CODE(TpyBaseMediaCallStream, tpy_base_media_call_stream,
 enum
 {
   PROP_LOCAL_CANDIDATES = 1,
+  PROP_LOCAL_CREDENTIALS,
   PROP_ENDPOINTS,
   PROP_TRANSPORT,
   PROP_STUN_SERVERS,
@@ -117,6 +118,14 @@ tpy_base_media_call_stream_get_property (GObject    *object,
       case PROP_LOCAL_CANDIDATES:
         {
           g_value_set_boxed (value, stream->priv->local_candidates);
+          break;
+        }
+      case PROP_LOCAL_CREDENTIALS:
+        {
+          g_value_take_boxed (value, tp_value_array_build (2,
+              G_TYPE_STRING, stream->priv->username,
+              G_TYPE_STRING, stream->priv->password,
+              G_TYPE_INVALID));
           break;
         }
       case PROP_ENDPOINTS:
@@ -281,6 +290,7 @@ tpy_base_media_call_stream_class_init (
   static TpDBusPropertiesMixinPropImpl stream_media_props[] = {
     { "Transport", "transport", NULL },
     { "LocalCandidates", "local-candidates", NULL },
+    { "LocalCredentials", "local-credentials", NULL },
     { "STUNServers", "stun-servers", NULL },
     { "RelayInfo", "relay-info", NULL },
     { "HasServerInfo", "has-server-info", NULL },
@@ -308,6 +318,13 @@ tpy_base_media_call_stream_class_init (
       TPY_ARRAY_TYPE_CANDIDATE_LIST,
       G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
   g_object_class_install_property (object_class, PROP_LOCAL_CANDIDATES,
+      param_spec);
+
+  param_spec = g_param_spec_boxed ("local-credentials", "LocalCredentials",
+      "ufrag and pwd as defined by ICE",
+      TPY_STRUCT_TYPE_STREAM_CREDENTIALS,
+      G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+  g_object_class_install_property (object_class, PROP_LOCAL_CREDENTIALS,
       param_spec);
 
   param_spec = g_param_spec_boxed ("endpoints", "Endpoints",
@@ -470,6 +487,7 @@ tpy_base_media_call_stream_set_credentials (
   self->priv->local_candidates = g_ptr_array_new();
 
   g_object_notify (G_OBJECT (self), "local-candidates");
+  g_object_notify (G_OBJECT (self), "local-credentials");
   tpy_svc_call_stream_interface_media_emit_local_credentials_changed (self,
       username, password);
 
