@@ -69,6 +69,8 @@ struct _TpyBaseMediaCallStreamPrivate
   GPtrArray *relay_info;
   GPtrArray *stun_servers;
   TpyStreamTransportType transport;
+  gchar *username;
+  gchar *password;
 
   gboolean got_relay_info;
 };
@@ -84,6 +86,10 @@ tpy_base_media_call_stream_init (TpyBaseMediaCallStream *self)
   priv->local_candidates = g_ptr_array_new();
   priv->relay_info = g_ptr_array_new ();
   priv->stun_servers = g_ptr_array_new ();
+
+  priv->username = g_strdup ("");
+  priv->password = g_strdup ("");
+
 }
 
 static void tpy_base_media_call_stream_dispose (GObject *object);
@@ -237,6 +243,17 @@ tpy_base_media_call_stream_set_stun_servers (TpyBaseMediaCallStream *self,
       self, stun_servers);
 }
 
+const gchar *tpy_base_media_call_stream_get_username (
+    TpyBaseMediaCallStream *self)
+{
+  return self->priv->username;
+}
+const gchar *tpy_base_media_call_stream_get_password (
+    TpyBaseMediaCallStream *self)
+{
+  return self->priv->password;
+}
+
 static void
 tpy_base_media_call_stream_constructed (GObject *obj)
 {
@@ -339,7 +356,7 @@ tpy_base_media_call_stream_class_init (
   bcs_class->extra_interfaces = interfaces;
 }
 
-void
+static void
 tpy_base_media_call_stream_dispose (GObject *object)
 {
   TpyBaseMediaCallStream *self = TPY_BASE_MEDIA_CALL_STREAM (object);
@@ -362,7 +379,7 @@ tpy_base_media_call_stream_dispose (GObject *object)
     G_OBJECT_CLASS (tpy_base_media_call_stream_parent_class)->dispose (object);
 }
 
-void
+static void
 tpy_base_media_call_stream_finalize (GObject *object)
 {
   TpyBaseMediaCallStream *self = TPY_BASE_MEDIA_CALL_STREAM (object);
@@ -436,6 +453,30 @@ tpy_base_media_call_stream_candidates_prepared (
 }
 
 static void
+tpy_base_media_call_stream_set_credentials (
+    TpySvcCallStreamInterfaceMedia *iface,
+    const gchar *username,
+    const gchar *password,
+    DBusGMethodInvocation *context)
+{
+  TpyBaseMediaCallStream *self = TPY_BASE_MEDIA_CALL_STREAM (iface);
+
+  g_free (self->priv->username);
+  self->priv->username = g_strdup (username);
+  g_free (self->priv->password);
+  self->priv->password = g_strdup (password);
+
+  g_boxed_free (TPY_ARRAY_TYPE_CANDIDATE_LIST, self->priv->local_candidates);
+  self->priv->local_candidates = g_ptr_array_new();
+
+  g_object_notify (G_OBJECT (self), "local-candidates");
+  tpy_svc_call_stream_interface_media_emit_local_credentials_changed (self,
+      username, password);
+
+  tpy_svc_call_stream_interface_media_return_from_set_credentials (context);
+}
+
+static void
 call_stream_media_iface_init (gpointer g_iface, gpointer iface_data)
 {
   TpySvcCallStreamInterfaceMediaClass *klass =
@@ -445,5 +486,6 @@ call_stream_media_iface_init (gpointer g_iface, gpointer iface_data)
     klass, tpy_base_media_call_stream_##x)
   IMPLEMENT(add_candidates);
   IMPLEMENT(candidates_prepared);
+  IMPLEMENT(set_credentials);
 #undef IMPLEMENT
 }
