@@ -211,14 +211,14 @@ tpy_base_media_call_stream_set_relay_info (
   priv->relay_info =
       g_boxed_copy (TP_ARRAY_TYPE_STRING_VARIANT_MAP_LIST, relays);
 
+  tpy_svc_call_stream_interface_media_emit_relay_info_changed (
+      self, priv->relay_info);
+
   if (!priv->got_relay_info)
     {
       priv->got_relay_info = TRUE;
       maybe_emit_server_info_retrieved (self);
     }
-
-  tpy_svc_call_stream_interface_media_emit_relay_info_changed (
-      self, priv->relay_info);
 }
 
 void tpy_base_media_call_stream_set_transport (
@@ -403,7 +403,7 @@ tpy_base_media_call_stream_finalize (GObject *object)
   TpyBaseMediaCallStreamPrivate *priv = self->priv;
 
   g_boxed_free (TPY_ARRAY_TYPE_CANDIDATE_LIST, priv->local_candidates);
-  g_boxed_free (TPY_ARRAY_TYPE_CANDIDATE_LIST, priv->relay_info);
+  g_boxed_free (TP_ARRAY_TYPE_STRING_VARIANT_MAP_LIST, priv->relay_info);
   g_boxed_free (TP_ARRAY_TYPE_SOCKET_ADDRESS_IP_LIST, priv->stun_servers);
 
   G_OBJECT_CLASS (tpy_base_media_call_stream_parent_class)->finalize (object);
