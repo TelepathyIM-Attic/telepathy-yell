@@ -102,7 +102,7 @@ gboolean tpy_base_call_stream_update_remote_member_states (
     ...) G_GNUC_NULL_TERMINATED;
 
 gboolean tpy_base_call_stream_remove_member (
-    TpyBaseCallStream *self, 
+    TpyBaseCallStream *self,
     TpHandle removed);
 
 gboolean tpy_base_call_stream_set_sending (TpyBaseCallStream *self,

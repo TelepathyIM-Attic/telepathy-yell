@@ -84,7 +84,7 @@ tpy_base_media_call_stream_init (TpyBaseMediaCallStream *self)
 
   self->priv = priv;
 
-  priv->local_candidates = g_ptr_array_new();
+  priv->local_candidates = g_ptr_array_new ();
   priv->relay_info = g_ptr_array_new ();
   priv->stun_servers = g_ptr_array_new ();
 
@@ -492,7 +492,7 @@ tpy_base_media_call_stream_set_credentials (
   self->priv->password = g_strdup (password);
 
   g_boxed_free (TPY_ARRAY_TYPE_CANDIDATE_LIST, self->priv->local_candidates);
-  self->priv->local_candidates = g_ptr_array_new();
+  self->priv->local_candidates = g_ptr_array_new ();
 
   g_object_notify (G_OBJECT (self), "local-candidates");
   g_object_notify (G_OBJECT (self), "local-credentials");
