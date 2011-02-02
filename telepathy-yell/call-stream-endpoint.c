@@ -460,9 +460,9 @@ tpy_call_stream_endpoint_add_new_candidates (
 void tpy_call_stream_endpoint_add_new_candidate (
     TpyCallStreamEndpoint *self,
     guint component,
-    gchar *address,
+    const gchar *address,
     guint port,
-    GHashTable *info_hash)
+    const GHashTable *info_hash)
 {
   GPtrArray *candidates = g_ptr_array_sized_new (1);
   GValueArray *a;

@@ -205,11 +205,12 @@ tpy_base_media_call_stream_set_relay_info (
 {
   TpyBaseMediaCallStreamPrivate *priv = self->priv;
 
-  g_return_if_fail (relays != NULL);
-
-  g_boxed_free (TP_ARRAY_TYPE_STRING_VARIANT_MAP_LIST, priv->relay_info);
-  priv->relay_info =
-      g_boxed_copy (TP_ARRAY_TYPE_STRING_VARIANT_MAP_LIST, relays);
+  if (relays != NULL)
+    {
+      g_boxed_free (TP_ARRAY_TYPE_STRING_VARIANT_MAP_LIST, priv->relay_info);
+      priv->relay_info =
+          g_boxed_copy (TP_ARRAY_TYPE_STRING_VARIANT_MAP_LIST, relays);
+    }
 
   tpy_svc_call_stream_interface_media_emit_relay_info_changed (
       self, priv->relay_info);
@@ -234,6 +235,13 @@ tpy_base_media_call_stream_take_endpoint (
     TpyCallStreamEndpoint *endpoint)
 {
   self->priv->endpoints = g_list_append (self->priv->endpoints, endpoint);
+}
+
+GList *
+tpy_base_media_call_stream_get_endpoints (
+    TpyBaseMediaCallStream *self)
+{
+  return self->priv->endpoints;
 }
 
 void

@@ -196,6 +196,9 @@ tpy_base_call_stream_set_property (
         g_free (priv->object_path);
         priv->object_path = g_value_dup_string (value);
         break;
+      case PROP_LOCAL_SENDING_STATE:
+        self->priv->local_sending_state = g_value_get_uint (value);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
         break;
@@ -260,8 +263,8 @@ tpy_base_call_stream_class_init (TpyBaseCallStreamClass *bsc_class)
 
   param_spec = g_param_spec_uint ("local-sending-state", "LocalSendingState",
       "Local sending state",
-      0, G_MAXUINT, 0,
-      G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+      0, NUM_TPY_SENDING_STATES, 0,
+      G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
   g_object_class_install_property (object_class, PROP_LOCAL_SENDING_STATE,
       param_spec);
 
@@ -295,8 +298,8 @@ tpy_base_call_stream_get_object_path (TpyBaseCallStream *self)
   return self->priv->object_path;
 }
 
-gboolean
-tpy_base_call_stream_remote_member_update_state (TpyBaseCallStream *self,
+static gboolean
+_remote_member_update_state (TpyBaseCallStream *self,
     TpHandle contact,
     TpySendingState state)
 {
@@ -322,6 +325,67 @@ tpy_base_call_stream_remote_member_update_state (TpyBaseCallStream *self,
   return TRUE;
 }
 
+gboolean
+tpy_base_call_stream_update_remote_member_states (TpyBaseCallStream *self,
+      TpHandle peer, TpySendingState remote_state,
+      ...)
+{
+  GHashTable *updates = g_hash_table_new (g_direct_hash, g_direct_equal);
+  gboolean updated = FALSE;
+  va_list args;
+
+  va_start (args, remote_state);
+
+  do
+    {
+      if (_remote_member_update_state (self, peer, remote_state))
+        {
+          g_hash_table_insert (updates,
+              GUINT_TO_POINTER (peer),
+              GUINT_TO_POINTER (remote_state));
+          updated = TRUE;
+        }
+
+      peer = va_arg (args, TpHandle);
+      if (peer != 0)
+        remote_state = va_arg (args, TpySendingState);
+    }
+  while (peer != 0);
+
+  if (updated)
+    {
+      GArray *empty = g_array_new (FALSE, TRUE, sizeof (TpHandle));
+
+      tpy_svc_call_stream_emit_remote_members_changed (self, updates, empty);
+      g_array_unref (empty);
+    }
+
+  g_hash_table_unref (updates);
+  return updated;
+}
+
+gboolean
+tpy_base_call_stream_remove_member (TpyBaseCallStream *self,
+    TpHandle removed)
+{
+  GArray *removed_array;
+  GHashTable *empty;
+
+  if (!g_hash_table_remove (self->priv->remote_members,
+      GUINT_TO_POINTER(removed)))
+    return FALSE;
+
+  empty= g_hash_table_new (g_direct_hash, g_direct_equal);
+  removed_array = g_array_sized_new (FALSE, TRUE, sizeof (TpHandle), 1);
+  g_array_append_val (removed_array, removed);
+
+  tpy_svc_call_stream_emit_remote_members_changed (self, empty, removed_array);
+
+  g_hash_table_unref (empty);
+  g_array_free (removed_array, TRUE);
+  return TRUE;
+}
+
 TpySendingState
 tpy_base_call_stream_get_local_sending_state (
   TpyBaseCallStream *self)
@@ -339,6 +403,7 @@ tpy_base_call_stream_update_local_sending_state (TpyBaseCallStream *self,
     return FALSE;
 
   priv->local_sending_state = state;
+  g_object_notify (G_OBJECT (self), "local-sending-state");
 
   tpy_svc_call_stream_emit_local_sending_state_changed (
     TPY_SVC_CALL_STREAM (self), state);
