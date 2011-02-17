@@ -29,7 +29,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([1.11 -Wall -Wno-portability foreign])
 AM_CONFIG_HEADER(config.h)
 
-AM_SILENT_RULES
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES])
 
 dnl check for tools
 AC_PROG_CC
