@@ -29,5 +29,6 @@
 #include <telepathy-yell/svc-call.h>
 #include <telepathy-yell/call-stream.h>
 #include <telepathy-yell/call-content.h>
+#include <telepathy-yell/call-channel.h>
 
 #endif
