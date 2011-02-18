@@ -27,6 +27,8 @@ libtelepathy_yell_la_SOURCES = \
     base-media-call-content.h \
     base-media-call-stream.h \
     base-media-call-stream.c \
+    call-stream.h \
+    call-stream.c \
     call-stream-endpoint.h \
     call-stream-endpoint.c \
     call-content-codec-offer.h \
@@ -55,6 +57,7 @@ codegen_headers = \
 
 headers = \
     telepathy-yell.h \
+    call-stream.h \
     extensions.h \
     gtypes.h \
     enums.h \

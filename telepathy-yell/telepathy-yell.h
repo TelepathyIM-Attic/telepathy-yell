@@ -27,5 +27,6 @@
 #include <telepathy-yell/interfaces.h>
 #include <telepathy-yell/cli-call.h>
 #include <telepathy-yell/svc-call.h>
+#include <telepathy-yell/call-stream.h>
 
 #endif
