@@ -774,6 +774,18 @@ tpy_call_channel_hangup_finish (TpyCallChannel *self,
 {
 }
 
+gboolean
+tpy_call_channel_has_initial_video (TpyCallChannel *self)
+{
+  return self->priv->initial_video;
+}
+
+gboolean
+tpy_call_channel_has_initial_audio (TpyCallChannel *self)
+{
+  return self->priv->initial_audio;
+}
+
 void
 tpy_call_channel_send_video (TpyCallChannel *self,
     gboolean send)
@@ -785,20 +797,6 @@ tpy_call_channel_send_video (TpyCallChannel *self,
           NULL, NULL, NULL, NULL);
     }
   // FIXME else
-}
-
-gboolean
-tpy_call_channel_is_sending_video (TpyCallChannel *self)
-{
-  // FIXME
-  return FALSE;
-}
-
-gboolean
-tpy_call_channel_is_receiving_video (TpyCallChannel *self)
-{
-  // FIXME
-  return FALSE;
 }
 
 gboolean

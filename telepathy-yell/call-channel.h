@@ -100,8 +100,8 @@ TpyCallContent *tpy_call_channel_add_content_finish (TpyCallChannel *self,
 void tpy_call_channel_send_video (TpyCallChannel *self,
     gboolean send);
 
-gboolean tpy_call_channel_is_sending_video (TpyCallChannel *self);
-gboolean tpy_call_channel_is_receiving_video (TpyCallChannel *self);
+gboolean tpy_call_channel_has_initial_audio (TpyCallChannel *self);
+gboolean tpy_call_channel_has_initial_video (TpyCallChannel *self);
 
 gboolean tpy_call_channel_has_dtmf (TpyCallChannel *self);
 
