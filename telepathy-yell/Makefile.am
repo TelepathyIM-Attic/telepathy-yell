@@ -11,7 +11,6 @@ tpyincludedir=$(includedir)/telepathy-1.0/telepathy-yell
 genincludedir=$(tpyincludedir)/_gen
 else
 noinst_LTLIBRARIES = libtelepathy-yell.la
-libtelepathy_yell_la_LDFLAGS = -static
 endif
 
 libtelepathy_yell_la_LIBADD = $(ALL_LIBS)
