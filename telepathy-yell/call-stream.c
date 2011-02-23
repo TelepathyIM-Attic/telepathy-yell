@@ -219,6 +219,7 @@ static void
 tpy_call_stream_class_init (TpyCallStreamClass *bsc_class)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (bsc_class);
+  TpProxyClass *proxy_class = (TpProxyClass *) bsc_class;
   GParamSpec *param_spec;
 
   g_type_class_add_private (bsc_class, sizeof (TpyCallStreamPrivate));
@@ -227,6 +228,8 @@ tpy_call_stream_class_init (TpyCallStreamClass *bsc_class)
   object_class->constructed = tpy_call_stream_constructed;
   object_class->set_property = tpy_call_stream_set_property;
   object_class->get_property = tpy_call_stream_get_property;
+
+  proxy_class->interface = TPY_IFACE_QUARK_CALL_STREAM;
 
   param_spec = g_param_spec_boxed ("remote-members", "Remote members",
       "Remote member map",
