@@ -312,43 +312,19 @@ tpy_call_channel_get_property (GObject *object,
       case PROP_STATE_DETAILS:
         g_value_set_boxed (value, self->priv->details);
         break;
-#if 0
-      case PROP_STATE_REASON:
-        g_value_set_ (value, );
-        break;
 
-      case PROP_HARDWARE_STREAMING:
-        g_value_set_ (value, );
-        break;
-#endif
       case PROP_MEMBERS:
         g_value_set_boxed (value, self->priv->members);
         break;
-#if 0
-      case PROP_INITIAL_TRANSPORT:
-        g_value_set_ (value, );
-        break;
-#endif
+
       case PROP_INITIAL_AUDIO:
         g_value_set_boolean (value, self->priv->initial_audio);
         break;
-#if 0
-      case PROP_INITIAL_AUDIO_NAME:
-        g_value_set_ (value, );
-        break;
-#endif
+
       case PROP_INITIAL_VIDEO:
         g_value_set_boolean (value, self->priv->initial_video);
         break;
-#if 0
-      case PROP_INITIAL_VIDEO_NAME:
-        g_value_set_ (value, );
-        break;
 
-      case PROP_MUTABLE_CONTENTS:
-        g_value_set_ (value, );
-        break;
-#endif
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
         break;
