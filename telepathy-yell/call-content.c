@@ -226,8 +226,6 @@ tpy_call_content_init (TpyCallContent *self)
       TPY_TYPE_CALL_CONTENT, TpyCallContentPrivate);
 
   self->priv = priv;
-
-  tp_proxy_add_interface_by_id (TP_PROXY (self), TPY_IFACE_QUARK_CALL_CONTENT);
 }
 
 static void
@@ -303,6 +301,7 @@ tpy_call_content_class_init (
     TpyCallContentClass *klass)
 {
   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+  TpProxyClass *proxy_class = TP_PROXY_CLASS (klass);
   GParamSpec *param_spec;
 
   g_type_class_add_private (klass, sizeof (TpyCallContentPrivate));
@@ -311,6 +310,8 @@ tpy_call_content_class_init (
   object_class->dispose = tpy_call_content_dispose;
   object_class->get_property = tpy_call_content_get_property;
   object_class->set_property = tpy_call_content_set_property;
+
+  proxy_class->interface = TPY_IFACE_QUARK_CALL_CONTENT;
 
   param_spec = g_param_spec_string ("name", "Name",
       "The name of this content, if any",
