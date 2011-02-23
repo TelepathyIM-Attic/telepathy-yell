@@ -233,6 +233,7 @@ tpy_call_content_dispose (GObject *object)
 {
   TpyCallContent *self = TPY_CALL_CONTENT (object);
 
+  tp_clear_pointer (&self->priv->name, g_free);
   tp_clear_object (&self->priv->result);
 
   g_list_free_full (self->priv->streams, g_object_unref);
@@ -282,6 +283,7 @@ tpy_call_content_set_property (
   switch (property_id)
     {
       case PROP_NAME:
+        g_assert (self->priv->name == NULL);
         self->priv->name = g_value_dup_string (value);
         break;
       case PROP_MEDIA_TYPE:
