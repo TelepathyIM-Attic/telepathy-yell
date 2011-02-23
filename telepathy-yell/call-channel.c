@@ -770,16 +770,12 @@ tpy_call_channel_send_video (TpyCallChannel *self,
   gboolean found = FALSE;
   guint i;
 
-  DEBUG ("SETTING VIDEO sent: %d", send);
-
   /* Loop over all the contents, if some of them a video set all their
    * streams to sending, otherwise request a video channel in case we want to
    * sent */
   for (i = 0 ; i < self->priv->contents->len ; i++)
     {
       TpyCallContent *content = g_ptr_array_index (self->priv->contents, i);
-
-      DEBUG ( " %p %d", content, tpy_call_content_get_media_type (content));
 
       if (tpy_call_content_get_media_type (content)
           == TP_MEDIA_STREAM_TYPE_VIDEO)
