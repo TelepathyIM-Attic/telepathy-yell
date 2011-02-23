@@ -232,21 +232,21 @@ on_call_channel_get_all_properties_cb (TpProxy *proxy,
       return;
     }
 
-  self->priv->state = g_value_get_uint (
-      g_hash_table_lookup (properties, "CallState"));
-  self->priv->flags = g_value_get_uint (
-      g_hash_table_lookup (properties, "CallFlags"));
-  self->priv->details = g_value_dup_boxed (
-      g_hash_table_lookup (properties, "CallStateDetails"));
-  self->priv->initial_audio = g_value_get_boolean (
-      g_hash_table_lookup (properties, "InitialAudio"));
-  self->priv->initial_video = g_value_get_boolean (
-      g_hash_table_lookup (properties, "InitialVideo"));
-  self->priv->members = g_value_dup_boxed (
-      g_hash_table_lookup (properties, "CallMembers"));
+  self->priv->state = tp_asv_get_uint32 (properties,
+      "CallState", NULL);
+  self->priv->flags = tp_asv_get_uint32 (properties,
+      "CallFlags", NULL);
+  self->priv->details = g_boxed_copy (G_TYPE_HASH_TABLE,
+      tp_asv_get_boxed (properties, "CallStateDetails", G_TYPE_HASH_TABLE));
+  self->priv->initial_audio = tp_asv_get_boolean (properties,
+      "InitialAudio", NULL);
+  self->priv->initial_video = tp_asv_get_boolean (properties,
+      "InitialVideo", NULL);
+  self->priv->members = g_boxed_copy (G_TYPE_HASH_TABLE,
+      tp_asv_get_boxed (properties, "CallMembers", G_TYPE_HASH_TABLE));
 
-  contents = g_value_get_boxed (
-      g_hash_table_lookup (properties, "Contents"));
+  contents = g_boxed_copy (G_TYPE_PTR_ARRAY,
+      tp_asv_get_boxed (properties, "Contents", G_TYPE_PTR_ARRAY));
 
   for (i = 0; i < contents->len; i++)
     {
