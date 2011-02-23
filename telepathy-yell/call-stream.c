@@ -144,7 +144,7 @@ tpy_call_stream_constructed (GObject *obj)
 
   tp_cli_dbus_properties_call_get_all (self, -1,
       TPY_IFACE_CALL_STREAM,
-      on_call_stream_get_all_properties_cb, NULL, NULL, NULL);
+      on_call_stream_get_all_properties_cb, NULL, NULL, G_OBJECT (self));
 }
 
 static void
