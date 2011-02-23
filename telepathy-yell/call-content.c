@@ -446,3 +446,9 @@ tpy_call_content_remove_finish (TpyCallContent *self,
   return g_simple_async_result_get_op_res_gboolean (
     G_SIMPLE_ASYNC_RESULT (result));
 }
+
+GList *
+tpy_call_content_get_streams (TpyCallContent *self)
+{
+  return self->priv->streams;
+}
