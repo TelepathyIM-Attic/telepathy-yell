@@ -62,14 +62,14 @@ on_call_stream_get_all_properties_cb (TpProxy *proxy,
       return;
     }
 
-  self->priv->local_sending_state = g_value_get_uint (
-      g_hash_table_lookup (properties, "LocalSendingState"));
-  self->priv->can_request_receiving = g_value_get_boolean (
-      g_hash_table_lookup (properties, "CanRequestReceiving"));
+  self->priv->local_sending_state = tp_asv_get_uint32 (properties,
+      "LocalSendingState", NULL);
+  self->priv->can_request_receiving = tp_asv_get_boolean (properties,
+      "CanRequestReceiving", NULL);
 
   tp_clear_pointer (&self->priv->remote_members, g_hash_table_unref);
-  self->priv->remote_members = g_value_dup_boxed (
-      g_hash_table_lookup (properties, "RemoteMembers"));
+  self->priv->remote_members = g_boxed_copy (G_TYPE_HASH_TABLE,
+      tp_asv_get_boxed (properties, "RemoteMembers", G_TYPE_HASH_TABLE));
 }
 
 static void
