@@ -243,16 +243,19 @@ on_call_channel_get_all_properties_cb (TpProxy *proxy,
       "InitialVideo", NULL);
 
   hash_table = tp_asv_get_boxed (properties,
-      "CallStateDetails", G_TYPE_HASH_TABLE);
+      "CallStateDetails", TP_HASH_TYPE_STRING_VARIANT_MAP);
   if (hash_table != NULL)
-    self->priv->details = g_boxed_copy (G_TYPE_HASH_TABLE, hash_table);
+    self->priv->details = g_boxed_copy (TP_HASH_TYPE_STRING_VARIANT_MAP,
+        hash_table);
 
   hash_table = tp_asv_get_boxed (properties,
-      "CallMembers", G_TYPE_HASH_TABLE);
+      "CallMembers", TPY_HASH_TYPE_CALL_MEMBER_MAP);
   if (hash_table != NULL)
-    self->priv->members = g_boxed_copy (G_TYPE_HASH_TABLE, hash_table);
+    self->priv->members = g_boxed_copy (TPY_HASH_TYPE_CALL_MEMBER_MAP,
+        hash_table);
 
-  contents = tp_asv_get_boxed (properties, "Contents", G_TYPE_PTR_ARRAY);
+  contents = tp_asv_get_boxed (properties,
+      "Contents", TP_ARRAY_TYPE_OBJECT_PATH_LIST);
 
   for (i = 0; i < contents->len; i++)
     {

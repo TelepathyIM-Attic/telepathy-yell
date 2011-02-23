@@ -69,9 +69,11 @@ on_call_stream_get_all_properties_cb (TpProxy *proxy,
       "CanRequestReceiving", NULL);
 
   tp_clear_pointer (&self->priv->remote_members, g_hash_table_unref);
-  members = tp_asv_get_boxed (properties, "RemoteMembers", G_TYPE_HASH_TABLE);
+  members = tp_asv_get_boxed (properties,
+      "RemoteMembers", TPY_HASH_TYPE_CALL_MEMBER_MAP);
   if (members != NULL)
-    self->priv->remote_members = g_boxed_copy (G_TYPE_HASH_TABLE, members);
+    self->priv->remote_members =
+        g_boxed_copy (TPY_HASH_TYPE_CALL_MEMBER_MAP, members);
 }
 
 static void
