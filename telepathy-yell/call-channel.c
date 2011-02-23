@@ -235,13 +235,13 @@ on_call_channel_get_all_properties_cb (TpProxy *proxy,
       g_hash_table_lookup (properties, "CallState"));
   self->priv->flags = g_value_get_uint (
       g_hash_table_lookup (properties, "CallFlags"));
-  self->priv->details = g_value_get_boxed (
+  self->priv->details = g_value_dup_boxed (
       g_hash_table_lookup (properties, "CallStateDetails"));
   self->priv->initial_audio = g_value_get_boolean (
       g_hash_table_lookup (properties, "InitialAudio"));
   self->priv->initial_video = g_value_get_boolean (
       g_hash_table_lookup (properties, "InitialVideo"));
-  self->priv->members = g_value_get_boxed (
+  self->priv->members = g_value_dup_boxed (
       g_hash_table_lookup (properties, "CallMembers"));
 
   contents = g_value_get_boxed (

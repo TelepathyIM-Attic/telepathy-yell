@@ -68,7 +68,7 @@ on_call_stream_get_all_properties_cb (TpProxy *proxy,
       g_hash_table_lookup (properties, "CanRequestReceiving"));
 
   tp_clear_pointer (&self->priv->remote_members, g_hash_table_unref);
-  self->priv->remote_members = g_value_get_boxed (
+  self->priv->remote_members = g_value_dup_boxed (
       g_hash_table_lookup (properties, "RemoteMembers"));
 }
 
