@@ -48,6 +48,7 @@
 #include <config.h>
 
 #include "telepathy-yell/call-channel.h"
+#include "telepathy-yell/call-stream.h"
 
 #include <telepathy-glib/dbus.h>
 #include <telepathy-glib/enums.h>
@@ -790,13 +791,41 @@ void
 tpy_call_channel_send_video (TpyCallChannel *self,
     gboolean send)
 {
-  if (send)
+  TpyCallChannelPrivate *priv = self->priv;
+  gboolean found = FALSE;
+  guint i;
+
+  g_debug ("SETTING VIDEO sent: %d", send);
+
+  /* Loop over all the contents, if some of them a video set all their
+   * streams to sending, otherwise request a video channel in case we want to
+   * sent */
+  for (i = 0 ; i < priv->contents->len ; i++)
     {
-      tpy_cli_channel_type_call_call_add_content (TP_PROXY (self), -1,
-          "video", TP_MEDIA_STREAM_TYPE_VIDEO,
-          NULL, NULL, NULL, NULL);
+      TpyCallContent *content = g_ptr_array_index (priv->contents, i);
+
+      g_debug ( " %p %d", content, tpy_call_content_get_media_type (content));
+
+      if (tpy_call_content_get_media_type (content)
+          == TP_MEDIA_STREAM_TYPE_VIDEO)
+        {
+          GList *l;
+          found = TRUE;
+
+          for (l = tpy_call_content_get_streams (content);
+              l != NULL ; l = g_list_next (l))
+            {
+              TpyCallStream *stream = TPY_CALL_STREAM (l->data);
+              tpy_call_stream_set_sending_async (stream,
+                send, NULL, NULL);
+            }
+        }
     }
-  // FIXME else
+
+  if (send && !found)
+    tpy_cli_channel_type_call_call_add_content (TP_PROXY (self), -1,
+        "video", TP_MEDIA_STREAM_TYPE_VIDEO,
+        NULL, NULL, NULL, NULL);
 }
 
 gboolean
