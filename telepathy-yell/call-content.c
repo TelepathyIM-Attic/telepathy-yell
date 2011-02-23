@@ -62,6 +62,12 @@ enum
 
 static guint _signals[LAST_SIGNAL] = { 0, };
 
+static void on_call_content_get_all_properties_cb (TpProxy *proxy,
+    GHashTable *properties,
+    const GError *error,
+    gpointer user_data,
+    GObject *weak_object);
+
 static gint
 find_stream_for_object_path (gconstpointer a,
     gconstpointer b)
@@ -80,12 +86,8 @@ on_content_removed_cb (TpProxy *proxy,
 }
 
 static void
-on_streams_added_cb (TpProxy *proxy,
-    const GPtrArray *streams,
-    gpointer user_data,
-    GObject *weak_object)
+add_streams (TpyCallContent *self, const GPtrArray *streams)
 {
-  TpyCallContent *self = TPY_CALL_CONTENT (proxy);
   GPtrArray *object_streams;
   guint i;
 
@@ -117,6 +119,17 @@ on_streams_added_cb (TpProxy *proxy,
 
   g_signal_emit (self, _signals[STREAMS_ADDED], 0, object_streams);
   g_ptr_array_unref (object_streams);
+}
+
+static void
+on_streams_added_cb (TpProxy *proxy,
+    const GPtrArray *streams,
+    gpointer user_data,
+    GObject *weak_object)
+{
+  TpyCallContent *self = TPY_CALL_CONTENT (proxy);
+
+  add_streams (self, streams);
 }
 
 static void
@@ -200,6 +213,10 @@ tpy_call_content_constructed (GObject *obj)
       g_error_free (error);
       return;
     }
+
+  tp_cli_dbus_properties_call_get_all (self, -1,
+      TPY_IFACE_CALL_CONTENT,
+      on_call_content_get_all_properties_cb, NULL, NULL, G_OBJECT (self));
 }
 
 static void
@@ -392,6 +409,35 @@ tpy_call_content_get_disposition (TpyCallContent *self)
       TPY_CALL_CONTENT_DISPOSITION_NONE);
 
   return self->priv->disposition;
+}
+
+static void
+on_call_content_get_all_properties_cb (TpProxy *proxy,
+    GHashTable *properties,
+    const GError *error,
+    gpointer user_data,
+    GObject *weak_object)
+{
+  TpyCallContent *self = TPY_CALL_CONTENT (proxy);
+  GPtrArray *streams;
+
+  if (error != NULL)
+    {
+      g_warning ("Could not get the content properties: %s", error->message);
+      return;
+    }
+
+  self->priv->media_type = tp_asv_get_uint32 (properties, "Type", NULL);
+  g_free (self->priv->name);
+  self->priv->name = g_strdup (tp_asv_get_string (properties, "Name"));
+  self->priv->disposition = tp_asv_get_uint32 (properties, "Disposition",
+    NULL);
+
+  streams = tp_asv_get_boxed (properties, "Streams",
+    TP_ARRAY_TYPE_OBJECT_PATH_LIST);
+
+  if (streams != NULL)
+    add_streams (self, streams);
 }
 
 static void
