@@ -223,6 +223,7 @@ on_call_channel_get_all_properties_cb (TpProxy *proxy,
     GObject *weak_object)
 {
   TpyCallChannel *self = TPY_CALL_CHANNEL (proxy);
+  GHashTable *hash_table;
   GPtrArray *contents;
   guint i;
 
@@ -236,17 +237,22 @@ on_call_channel_get_all_properties_cb (TpProxy *proxy,
       "CallState", NULL);
   self->priv->flags = tp_asv_get_uint32 (properties,
       "CallFlags", NULL);
-  self->priv->details = g_boxed_copy (G_TYPE_HASH_TABLE,
-      tp_asv_get_boxed (properties, "CallStateDetails", G_TYPE_HASH_TABLE));
   self->priv->initial_audio = tp_asv_get_boolean (properties,
       "InitialAudio", NULL);
   self->priv->initial_video = tp_asv_get_boolean (properties,
       "InitialVideo", NULL);
-  self->priv->members = g_boxed_copy (G_TYPE_HASH_TABLE,
-      tp_asv_get_boxed (properties, "CallMembers", G_TYPE_HASH_TABLE));
 
-  contents = g_boxed_copy (G_TYPE_PTR_ARRAY,
-      tp_asv_get_boxed (properties, "Contents", G_TYPE_PTR_ARRAY));
+  hash_table = tp_asv_get_boxed (properties,
+      "CallStateDetails", G_TYPE_HASH_TABLE);
+  if (hash_table != NULL)
+    self->priv->details = g_boxed_copy (G_TYPE_HASH_TABLE, hash_table);
+
+  hash_table = tp_asv_get_boxed (properties,
+      "CallMembers", G_TYPE_HASH_TABLE);
+  if (hash_table != NULL)
+    self->priv->members = g_boxed_copy (G_TYPE_HASH_TABLE, hash_table);
+
+  contents = tp_asv_get_boxed (properties, "Contents", G_TYPE_PTR_ARRAY);
 
   for (i = 0; i < contents->len; i++)
     {

@@ -55,6 +55,7 @@ on_call_stream_get_all_properties_cb (TpProxy *proxy,
     GObject *weak_object)
 {
   TpyCallStream *self = TPY_CALL_STREAM (proxy);
+  GHashTable *members;
 
   if (error != NULL)
     {
@@ -68,8 +69,9 @@ on_call_stream_get_all_properties_cb (TpProxy *proxy,
       "CanRequestReceiving", NULL);
 
   tp_clear_pointer (&self->priv->remote_members, g_hash_table_unref);
-  self->priv->remote_members = g_boxed_copy (G_TYPE_HASH_TABLE,
-      tp_asv_get_boxed (properties, "RemoteMembers", G_TYPE_HASH_TABLE));
+  members = tp_asv_get_boxed (properties, "RemoteMembers", G_TYPE_HASH_TABLE);
+  if (members != NULL)
+    self->priv->remote_members = g_boxed_copy (G_TYPE_HASH_TABLE, members);
 }
 
 static void
