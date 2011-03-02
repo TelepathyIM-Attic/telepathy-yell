@@ -782,12 +782,16 @@ tpy_call_channel_get_state (TpyCallChannel *self,
 gboolean
 tpy_call_channel_has_initial_video (TpyCallChannel *self)
 {
+  g_return_val_if_fail (TPY_IS_CALL_CHANNEL (self), FALSE);
+
   return self->priv->initial_video;
 }
 
 gboolean
 tpy_call_channel_has_initial_audio (TpyCallChannel *self)
 {
+  g_return_val_if_fail (TPY_IS_CALL_CHANNEL (self), FALSE);
+
   return self->priv->initial_audio;
 }
 
@@ -797,6 +801,8 @@ tpy_call_channel_send_video (TpyCallChannel *self,
 {
   gboolean found = FALSE;
   guint i;
+
+  g_return_if_fail (TPY_IS_CALL_CHANNEL (self));
 
   /* Loop over all the contents, if some of them a video set all their
    * streams to sending, otherwise request a video channel in case we want to
