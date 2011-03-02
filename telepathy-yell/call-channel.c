@@ -289,7 +289,7 @@ tpy_call_channel_dispose (GObject *obj)
   TpyCallChannel *self = (TpyCallChannel *) obj;
 
   tp_clear_pointer (&self->priv->contents, g_ptr_array_unref);
-  self->priv->contents = NULL;
+  tp_clear_pointer (&self->priv->details, g_hash_table_unref);
 
   tp_clear_object (&self->priv->result);
 
