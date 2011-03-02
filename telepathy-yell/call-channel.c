@@ -760,6 +760,25 @@ tpy_call_channel_hangup_finish (TpyCallChannel *self,
 {
 }
 
+TpyCallState
+tpy_call_channel_get_state (TpyCallChannel *self,
+    TpyCallFlags *flags, GHashTable **details)
+{
+  g_return_val_if_fail (TPY_IS_CALL_CHANNEL (self), TPY_CALL_STATE_UNKNOWN);
+
+  if (flags != NULL)
+    *flags = self->priv->flags;
+
+  if (details != NULL)
+    {
+      if (self->priv->details != NULL)
+        g_hash_table_ref (self->priv->details);
+
+      *details = self->priv->details;
+    }
+  return self->priv->state;
+}
+
 gboolean
 tpy_call_channel_has_initial_video (TpyCallChannel *self)
 {
