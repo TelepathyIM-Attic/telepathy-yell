@@ -17,30 +17,19 @@ libtelepathy_yell_la_LIBADD = $(ALL_LIBS)
 
 libtelepathy_yell_la_SOURCES = \
     base-call-channel.c \
-    base-call-channel.h \
     base-call-stream.c \
-    base-call-stream.h \
     base-call-content.c \
-    base-call-content.h \
     base-media-call-content.c \
-    base-media-call-content.h \
-    base-media-call-stream.h \
     base-media-call-stream.c \
-    call-channel.h \
     call-channel.c \
-    call-content.h \
     call-content.c \
-    call-stream.h \
     call-stream.c \
-    call-stream-endpoint.h \
     call-stream-endpoint.c \
-    call-content-codec-offer.h \
     call-content-codec-offer.c \
-    debug.h \
     debug.c \
-    extensions.h \
     extensions.c \
-    extensions-cli.c
+    extensions-cli.c \
+    $(headers)
 
 codegen_sources = \
     _gen/signals-marshal.h \
@@ -60,9 +49,17 @@ codegen_headers = \
 
 headers = \
     telepathy-yell.h \
+    base-call-channel.h \
+    base-call-stream.h \
+    base-call-content.h \
+    base-media-call-stream.h \
+    base-media-call-content.h \
     call-channel.h \
     call-content.h \
+    call-content-codec-offer.h \
     call-stream.h \
+    call-stream-endpoint.h \
+    debug.h \
     extensions.h \
     gtypes.h \
     enums.h \
