@@ -4,7 +4,6 @@ EXTRA_DIST = \
 
 if ENABLE_SHARED_LIBRARY
 lib_LTLIBRARIES = libtelepathy-yell.la
-libtelepathy_yell_la_LDFLAGS = -release $(LIBRARY_SUFFIX)
 pkgconfigdir = ${libdir}/pkgconfig
 pkgconfig_DATA = telepathy-yell.pc
 tpyincludedir=$(includedir)/telepathy-1.0/telepathy-yell
