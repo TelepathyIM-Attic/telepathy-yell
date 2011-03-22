@@ -147,25 +147,26 @@ on_streams_removed_cb (TpProxy *proxy,
 
   for (i = 0; i < streams->len; i++)
     {
-      TpyCallStream *stream;
+      GList *s;
       const gchar *object_path;
 
       object_path = g_ptr_array_index (streams, i);
 
-      stream = TPY_CALL_STREAM (g_list_find_custom (self->priv->streams, object_path,
-          find_stream_for_object_path));
+      s = g_list_find_custom (self->priv->streams,
+          object_path,
+          find_stream_for_object_path);
 
-      if (stream == NULL)
+      if (s == NULL)
         {
           g_warning ("Could not find a CallStream for path %s", object_path);
           continue;
         }
 
-      self->priv->streams = g_list_remove (self->priv->streams, stream);
-      g_ptr_array_add (object_streams, stream);
+      self->priv->streams = g_list_remove_link (self->priv->streams, s);
+      g_ptr_array_add (object_streams, s->data);
     }
 
-  g_signal_emit (self, _signals[STREAMS_ADDED], 0, object_streams);
+  g_signal_emit (self, _signals[STREAMS_REMOVED], 0, object_streams);
 
   g_ptr_array_unref (object_streams);
 }
