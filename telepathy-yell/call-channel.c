@@ -833,6 +833,41 @@ tpy_call_channel_send_video (TpyCallChannel *self,
         NULL, NULL, NULL, NULL);
 }
 
+TpySendingState
+tpy_call_channel_get_video_state (TpyCallChannel *self)
+{
+  TpySendingState result = TPY_SENDING_STATE_NONE;
+  guint i;
+
+  g_return_val_if_fail (TPY_IS_CALL_CHANNEL (self), TPY_SENDING_STATE_NONE);
+
+  for (i = 0 ; i < self->priv->contents->len ; i++)
+    {
+      TpyCallContent *content = g_ptr_array_index (self->priv->contents, i);
+
+      if (tpy_call_content_get_media_type (content)
+          == TP_MEDIA_STREAM_TYPE_VIDEO)
+        {
+          GList *l;
+
+          for (l = tpy_call_content_get_streams (content);
+              l != NULL ; l = g_list_next (l))
+            {
+              TpyCallStream *stream = TPY_CALL_STREAM (l->data);
+              TpySendingState state;
+
+              g_object_get (stream, "local-sending-state", &state, NULL);
+              if (state != TPY_SENDING_STATE_PENDING_STOP_SENDING &&
+                  state > result)
+                result = state;
+            }
+        }
+    }
+
+  return result;
+}
+
+
 gboolean
 tpy_call_channel_has_dtmf (TpyCallChannel *self)
 {

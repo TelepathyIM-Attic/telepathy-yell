@@ -100,6 +100,8 @@ TpyCallContent *tpy_call_channel_add_content_finish (TpyCallChannel *self,
 void tpy_call_channel_send_video (TpyCallChannel *self,
     gboolean send);
 
+TpySendingState tpy_call_channel_get_video_state (TpyCallChannel *self);
+
 TpyCallState tpy_call_channel_get_state (TpyCallChannel *self,
     TpyCallFlags *flags, GHashTable **details);
 
