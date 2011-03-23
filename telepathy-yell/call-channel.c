@@ -581,7 +581,7 @@ tpy_call_channel_class_init (TpyCallChannelClass *klass)
    * Since:
    */
   param_spec = g_param_spec_boolean ("ready", "Ready",
-      "If true the call channel and all its contents have retrieved all"
+      "If true the call channel and all its contents have retrieved all "
       "all async information from the CM",
       FALSE,
       G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
