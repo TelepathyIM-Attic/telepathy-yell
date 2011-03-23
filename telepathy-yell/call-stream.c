@@ -36,6 +36,7 @@ enum
   PROP_REMOTE_MEMBERS = 1,
   PROP_LOCAL_SENDING_STATE,
   PROP_CAN_REQUEST_RECEIVING,
+  PROP_READY,
 };
 
 struct _TpyCallStreamPrivate
@@ -43,6 +44,7 @@ struct _TpyCallStreamPrivate
   GHashTable *remote_members;
   TpySendingState local_sending_state;
   gboolean can_request_receiving;
+  gboolean ready;
 
   GSimpleAsyncResult *result;
 };
@@ -74,6 +76,9 @@ on_call_stream_get_all_properties_cb (TpProxy *proxy,
   if (members != NULL)
     self->priv->remote_members =
         g_boxed_copy (TPY_HASH_TYPE_CALL_MEMBER_MAP, members);
+
+  self->priv->ready = TRUE;
+  g_object_notify (G_OBJECT (self), "ready");
 }
 
 static void
@@ -193,6 +198,9 @@ tpy_call_stream_get_property (
       case PROP_CAN_REQUEST_RECEIVING:
         g_value_set_boolean (value, priv->can_request_receiving);
         break;
+      case PROP_READY:
+        g_value_set_boolean (value, priv->ready);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
         break;
@@ -256,6 +264,14 @@ tpy_call_stream_class_init (TpyCallStreamClass *bsc_class)
       FALSE,
       G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
   g_object_class_install_property (object_class, PROP_CAN_REQUEST_RECEIVING,
+      param_spec);
+
+  param_spec = g_param_spec_boolean ("ready",
+      "Ready",
+      "If true the stream has retrieved all async information from the CM",
+      FALSE,
+      G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+  g_object_class_install_property (object_class, PROP_READY,
       param_spec);
 }
 

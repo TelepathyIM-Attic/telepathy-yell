@@ -40,6 +40,8 @@ struct _TpyCallContentPrivate
   TpMediaStreamType media_type;
   TpyCallContentDisposition disposition;
   GList *streams;
+  gboolean ready;
+  gboolean properties_retrieved;
 
   GSimpleAsyncResult *result;
 };
@@ -49,7 +51,8 @@ enum
   PROP_NAME = 1,
   PROP_MEDIA_TYPE,
   PROP_DISPOSITION,
-  PROP_STREAMS
+  PROP_STREAMS,
+  PROP_READY
 };
 
 enum
@@ -86,6 +89,42 @@ on_content_removed_cb (TpProxy *proxy,
 }
 
 static void
+maybe_go_to_ready (TpyCallContent *self)
+{
+  TpyCallContentPrivate *priv = self->priv;
+  GList *l;
+
+  if (priv->ready)
+    return;
+
+  if (!priv->properties_retrieved)
+    return;
+
+
+  for (l = priv->streams; l != NULL ; l = g_list_next (l))
+    {
+      TpyCallStream *s = l->data;
+      gboolean ready;
+
+      g_object_get (s, "ready", &ready, NULL);
+
+      if (!ready)
+        return;
+    }
+
+  priv->ready = TRUE;
+  g_object_notify (G_OBJECT (self), "ready");
+}
+
+static void
+on_stream_ready_cb (TpyCallStream *stream,
+  GParamSpec *spec,
+  TpyCallContent *self)
+{
+  maybe_go_to_ready (self);
+}
+
+static void
 add_streams (TpyCallContent *self, const GPtrArray *streams)
 {
   GPtrArray *object_streams;
@@ -112,6 +151,9 @@ add_streams (TpyCallContent *self, const GPtrArray *streams)
           g_warning ("Could not create a CallStream for path %s", object_path);
           continue;
         }
+
+      tp_g_signal_connect_object (stream, "notify::ready",
+        G_CALLBACK (on_stream_ready_cb), self, 0);
 
       self->priv->streams = g_list_prepend (self->priv->streams, stream);
       g_ptr_array_add (object_streams, stream);
@@ -266,6 +308,9 @@ tpy_call_content_get_property (
       case PROP_STREAMS:
         g_value_set_boxed (value, self->priv->streams);
         break;
+      case PROP_READY:
+        g_value_set_boolean (value, self->priv->ready);
+        break;
       default:
         G_OBJECT_WARN_INVALID_PROPERTY_ID (object, property_id, pspec);
         break;
@@ -339,6 +384,15 @@ tpy_call_content_class_init (
       TP_ARRAY_TYPE_OBJECT_PATH_LIST,
       G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
   g_object_class_install_property (object_class, PROP_STREAMS,
+      param_spec);
+
+  param_spec = g_param_spec_boolean ("ready",
+      "Ready",
+      "If true the content and all its streams have retrieved all"
+      "all async information from the CM",
+      FALSE,
+      G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+  g_object_class_install_property (object_class, PROP_READY,
       param_spec);
 
   /**
@@ -442,6 +496,9 @@ on_call_content_get_all_properties_cb (TpProxy *proxy,
 
   if (streams != NULL)
     add_streams (self, streams);
+
+  self->priv->properties_retrieved = TRUE;
+  maybe_go_to_ready (self);
 }
 
 static void

@@ -82,6 +82,9 @@ struct _TpyCallChannelPrivate
   GPtrArray *contents;
 
   GSimpleAsyncResult *result;
+
+  gboolean properties_retrieved;
+  gboolean ready;
 };
 
 enum /* props */
@@ -98,7 +101,8 @@ enum /* props */
   PROP_INITIAL_AUDIO_NAME,
   PROP_INITIAL_VIDEO,
   PROP_INITIAL_VIDEO_NAME,
-  PROP_MUTABLE_CONTENTS
+  PROP_MUTABLE_CONTENTS,
+  PROP_READY
 };
 
 enum /* signals */
@@ -111,6 +115,41 @@ enum /* signals */
 };
 
 static guint _signals[LAST_SIGNAL] = { 0, };
+
+static void
+maybe_go_to_ready (TpyCallChannel *self)
+{
+  TpyCallChannelPrivate *priv = self->priv;
+  guint i;
+
+  if (priv->ready)
+    return;
+
+  if (!priv->properties_retrieved)
+    return;
+
+  for (i = 0 ; i < priv->contents->len; i++)
+    {
+      TpyCallContent *c = g_ptr_array_index (self->priv->contents, i);
+      gboolean ready;
+
+      g_object_get (c, "ready", &ready, NULL);
+
+      if (!ready)
+        return;
+    }
+
+  priv->ready = TRUE;
+  g_object_notify (G_OBJECT (self), "ready");
+}
+
+static void
+on_content_ready_cb (TpyCallContent *content,
+  GParamSpec *spec,
+  TpyCallChannel *self)
+{
+  maybe_go_to_ready (self);
+}
 
 static void
 on_content_added_cb (TpProxy *proxy,
@@ -137,6 +176,8 @@ on_content_added_cb (TpProxy *proxy,
     }
 
   g_ptr_array_add (self->priv->contents, content);
+  tp_g_signal_connect_object (content, "notify::ready",
+    G_CALLBACK (on_content_ready_cb), self, 0);
 
   g_signal_emit (self, _signals[CONTENT_ADDED], 0, content);
 }
@@ -278,9 +319,16 @@ on_call_channel_get_all_properties_cb (TpProxy *proxy,
         }
 
       g_ptr_array_add (self->priv->contents, content);
+
+      tp_g_signal_connect_object (content, "notify::ready",
+        G_CALLBACK (on_content_ready_cb), self, 0);
     }
 
   g_signal_emit (self, _signals[MEMBERS_CHANGED], 0, self->priv->members);
+
+  self->priv->properties_retrieved = TRUE;
+
+  maybe_go_to_ready (self);
 }
 
 static void
@@ -332,6 +380,10 @@ tpy_call_channel_get_property (GObject *object,
 
       case PROP_INITIAL_VIDEO:
         g_value_set_boolean (value, self->priv->initial_video);
+        break;
+
+      case PROP_READY:
+        g_value_set_boolean (value, self->priv->ready);
         break;
 
       default:
@@ -522,6 +574,21 @@ tpy_call_channel_class_init (TpyCallChannelClass *klass)
       PROP_INITIAL_VIDEO, param_spec);
 
   /**
+   * TpyCallChannel:ready:
+   *
+   * Whether or call channel got all its async information
+   *
+   * Since:
+   */
+  param_spec = g_param_spec_boolean ("ready", "Ready",
+      "If true the call channel and all its contents have retrieved all"
+      "all async information from the CM",
+      FALSE,
+      G_PARAM_READABLE | G_PARAM_STATIC_STRINGS);
+  g_object_class_install_property (gobject_class, PROP_READY,
+      param_spec);
+
+  /**
    * TpyCallChannel::content-added
    * @self: the #TpyCallChannel
    * @content: the newly added content
@@ -588,6 +655,7 @@ tpy_call_channel_class_init (TpyCallChannelClass *klass)
       g_cclosure_marshal_VOID__BOXED,
       G_TYPE_NONE,
       1, G_TYPE_HASH_TABLE);
+
 }
 
 static void
