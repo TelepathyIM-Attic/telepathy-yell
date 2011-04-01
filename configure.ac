@@ -84,9 +84,9 @@ AC_SUBST([ENABLE_CODING_STYLE_CHECKS])
 
 dnl shared library
 AC_ARG_ENABLE(shared-library,
-  AC_HELP_STRING([--enable-shared-library],
-                 [produce a shared library to install]),
-    [ENABLE_SHARED_LIBRARY=yes], [ENABLE_SHARED_LIBRARY=no])
+  AC_HELP_STRING([--disable-shared-library],
+                 [disable producing a shared library to install]),
+    [ENABLE_SHARED_LIBRARY=$enableval], [ENABLE_SHARED_LIBRARY=yes])
 
 AM_CONDITIONAL(ENABLE_SHARED_LIBRARY, test "x$ENABLE_SHARED_LIBRARY" != "xno")
 
