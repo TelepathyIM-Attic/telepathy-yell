@@ -14,6 +14,16 @@ m4_define([tp_yell_minor_version], [0])
 m4_define([tp_yell_micro_version], [0])
 m4_define([tp_yell_nano_version], [1])
 
+# If library source has changed since last release, increment revision
+# If interfaces have been added, removed or changed since last release,
+#  increment current and set revision to 0
+# If interfaces have been added since last release, increment age
+# If interfaces have been removed since last release, set age to 0
+
+m4_define([tp_yell_lt_current], [0])
+m4_define([tp_yell_lt_revision], [0])
+m4_define([tp_yell_lt_age], [0])
+
 # Some magic
 m4_define([tp_yell_base_version],
           [tp_yell_major_version.tp_yell_minor_version.tp_yell_micro_version])
@@ -38,6 +48,13 @@ AC_PROG_INSTALL
 AC_PROG_LIBTOOL
 AM_PROG_LIBTOOL
 AM_PROG_MKDIR_P
+
+LT_CURRENT=tp_yell_lt_current
+LT_REVISION=tp_yell_lt_revision
+LT_AGE=tp_yell_lt_age
+AC_SUBST([LT_CURRENT])
+AC_SUBST([LT_REVISION])
+AC_SUBST([LT_AGE])
 
 dnl optimizations, etc.
 COMPILER_OPTIMISATIONS

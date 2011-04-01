@@ -8,6 +8,9 @@ pkgconfigdir = ${libdir}/pkgconfig
 pkgconfig_DATA = telepathy-yell.pc
 tpyincludedir=$(includedir)/telepathy-1.0/telepathy-yell
 genincludedir=$(tpyincludedir)/_gen
+libtelepathy_yell_la_LDFLAGS =  -no-undefined \
+   -export-symbols-regex "^tpy_.*" \
+      -version-info "$(LT_CURRENT)":"$(LT_REVISION)":"$(LT_AGE)"
 else
 noinst_LTLIBRARIES = libtelepathy-yell.la
 endif
