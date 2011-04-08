@@ -637,7 +637,7 @@ tpy_call_channel_class_init (TpyCallChannelClass *klass)
       0, NULL, NULL,
       _tpy_marshal_VOID__UINT_UINT_BOXED_BOXED,
       G_TYPE_NONE,
-      4, G_TYPE_UINT, G_TYPE_UINT, G_TYPE_PTR_ARRAY, G_TYPE_HASH_TABLE);
+      4, G_TYPE_UINT, G_TYPE_UINT, G_TYPE_VALUE_ARRAY, G_TYPE_HASH_TABLE);
 
   /**
    * TpyCallChannel::members-changed
