@@ -8,6 +8,7 @@
 .libs
 /*.cdbs-config_list
 /*.cdbs-orig
+/*.make
 /aclocal.m4
 /autom4te.cache
 /config.guess
