@@ -393,7 +393,7 @@ tpy_call_content_codec_offer_offer (TpyCallContentCodecOffer *offer,
 
   if (cancellable != NULL)
     {
-      priv->cancellable = cancellable;
+      priv->cancellable = g_object_ref (cancellable);
       priv->handler_id = g_cancellable_connect (
           cancellable, G_CALLBACK (cancelled_cb), offer, NULL);
     }

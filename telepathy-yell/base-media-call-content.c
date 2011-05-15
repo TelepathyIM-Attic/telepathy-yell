@@ -473,6 +473,7 @@ out:
   if (priv->current_offer == TPY_CALL_CONTENT_CODEC_OFFER (source))
     {
       priv->current_offer = NULL;
+      g_object_unref (priv->offer_cancellable);
       priv->offer_cancellable = NULL;
     }
 
