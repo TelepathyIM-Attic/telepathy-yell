@@ -11,7 +11,7 @@ AC_PREREQ([2.59])
 
 m4_define([tp_yell_major_version], [0])
 m4_define([tp_yell_minor_version], [0])
-m4_define([tp_yell_micro_version], [0])
+m4_define([tp_yell_micro_version], [1])
 m4_define([tp_yell_nano_version], [1])
 
 # If library source has changed since last release, increment revision
