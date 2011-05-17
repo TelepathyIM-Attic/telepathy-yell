@@ -83,8 +83,6 @@ tpy_base_call_stream_constructed (GObject *obj)
       != NULL)
     G_OBJECT_CLASS (tpy_base_call_stream_parent_class)->constructed (obj);
 
-  priv->local_sending_state = TPY_SENDING_STATE_NONE;
-
   /* register object on the bus */
   DEBUG ("Registering %s", priv->object_path);
   tp_dbus_daemon_register_object (bus, priv->object_path, obj);
@@ -263,7 +261,7 @@ tpy_base_call_stream_class_init (TpyBaseCallStreamClass *bsc_class)
 
   param_spec = g_param_spec_uint ("local-sending-state", "LocalSendingState",
       "Local sending state",
-      0, NUM_TPY_SENDING_STATES, 0,
+      TPY_SENDING_STATE_NONE, NUM_TPY_SENDING_STATES, TPY_SENDING_STATE_NONE,
       G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS);
   g_object_class_install_property (object_class, PROP_LOCAL_SENDING_STATE,
       param_spec);
