@@ -11,8 +11,8 @@ AC_PREREQ([2.59])
 
 m4_define([tp_yell_major_version], [0])
 m4_define([tp_yell_minor_version], [0])
-m4_define([tp_yell_micro_version], [1])
-m4_define([tp_yell_nano_version], [1])
+m4_define([tp_yell_micro_version], [2])
+m4_define([tp_yell_nano_version], [0])
 
 # If library source has changed since last release, increment revision
 # If interfaces have been added, removed or changed since last release,
@@ -21,7 +21,7 @@ m4_define([tp_yell_nano_version], [1])
 # If interfaces have been removed since last release, set age to 0
 
 m4_define([tp_yell_lt_current], [0])
-m4_define([tp_yell_lt_revision], [0])
+m4_define([tp_yell_lt_revision], [1])
 m4_define([tp_yell_lt_age], [0])
 
 # Some magic

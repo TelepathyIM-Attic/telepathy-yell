@@ -1,5 +1,12 @@
-telepathy-yell 0.0.1
-====================
+telepathy-yell 0.0.2 (20/05/2011)
+=================================
+
+Fix signal signature (Emilio Pozuelo Monfort)
+Make tpy_call_content_codec_offer_offer ref the cancellable (Mike Ruprecht)
+Don't Initialize member values in _constructed (Sjoerd Simons)
+
+telepathy-yell 0.0.1 (01/04/2011)
+=================================
 
 First release
 
