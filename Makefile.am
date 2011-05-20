@@ -4,3 +4,5 @@ SUBDIRS = m4 tools spec telepathy-yell
 
 EXTRA_DIST = \
     autogen.sh
+
+include tools/telepathy.am

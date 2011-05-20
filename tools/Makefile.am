@@ -13,11 +13,13 @@ EXTRA_DIST = \
     glib-gtypes-generator.py \
     glib-interfaces-gen.py \
     glib-signals-marshal-gen.py \
+    make-release-mail.py \
     gobject-foo.py \
     identity.xsl \
     libtpcodegen.py \
     libglibcodegen.py \
     make-version-script.py \
+    telepathy.am \
     with-session-bus.sh
 
 CLEANFILES = libtpcodegen.pyc libtpcodegen.pyo libglibcodegen.pyc libglibcodegen.pyo $(noinst_SCRIPTS)
