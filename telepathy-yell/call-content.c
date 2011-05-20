@@ -415,8 +415,8 @@ tpy_call_content_class_init (
    * @self: the #TpyCallContent
    * @stream: the newly added streams
    *
-   * The ::content-removed signal is emitted whenever
-   * #TpyCallContent are added from @self.
+   * The ::streams-added signal is emitted whenever
+   * #TpyCallStreams are added to @self.
    */
   _signals[STREAMS_ADDED] = g_signal_new ("streams-added",
       G_OBJECT_CLASS_TYPE (klass),
@@ -431,8 +431,8 @@ tpy_call_content_class_init (
    * @self: the #TpyCallContent
    * @stream: the newly removed streams
    *
-   * The ::content-removed signal is emitted whenever
-   * #TpyCallContent are removed from @self.
+   * The ::streams-removed signal is emitted whenever
+   * #TpyCallStreams are removed from @self.
    */
   _signals[STREAMS_REMOVED] = g_signal_new ("streams-removed",
       G_OBJECT_CLASS_TYPE (klass),
