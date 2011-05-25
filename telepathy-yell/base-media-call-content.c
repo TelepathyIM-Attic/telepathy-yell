@@ -479,6 +479,7 @@ out:
 
   --priv->offer_count;
   g_object_unref (source);
+  g_clear_error (&error);
 
   if (priv->deinit_has_run)
     maybe_finish_deinit (self);
