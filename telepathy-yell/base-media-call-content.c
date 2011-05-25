@@ -448,7 +448,7 @@ codec_offer_finished_cb (GObject *source,
   local_codecs = tpy_call_content_codec_offer_offer_finish (
     offer, result, &error);
 
-  if (error != NULL || priv->deinit_has_run ||
+  if (local_codecs == NULL || priv->deinit_has_run ||
       priv->current_offer != TPY_CALL_CONTENT_CODEC_OFFER (source))
     goto out;
 
