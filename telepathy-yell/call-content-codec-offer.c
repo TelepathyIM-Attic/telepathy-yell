@@ -413,7 +413,7 @@ tpy_call_content_codec_offer_offer_finish (
 {
   if (g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result),
       error))
-    return FALSE;
+    return NULL;
 
   g_return_val_if_fail (g_simple_async_result_is_valid (result,
     G_OBJECT (offer), tpy_call_content_codec_offer_offer_finish),

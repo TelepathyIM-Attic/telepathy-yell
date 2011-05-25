@@ -448,7 +448,7 @@ codec_offer_finished_cb (GObject *source,
   local_codecs = tpy_call_content_codec_offer_offer_finish (
     offer, result, &error);
 
-  if (error != NULL || priv->deinit_has_run ||
+  if (local_codecs == NULL || priv->deinit_has_run ||
       priv->current_offer != TPY_CALL_CONTENT_CODEC_OFFER (source))
     goto out;
 
@@ -479,6 +479,7 @@ out:
 
   --priv->offer_count;
   g_object_unref (source);
+  g_clear_error (&error);
 
   if (priv->deinit_has_run)
     maybe_finish_deinit (self);

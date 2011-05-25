@@ -437,7 +437,7 @@ tpy_base_media_call_stream_add_candidates (
     g_set_error_literal (&error, TP_ERRORS, TP_ERROR_CONFUSED,
         "CM failed to implement the compulsory function add_local_candidates");
 
-  if (error != NULL)
+  if (accepted_candidates == NULL)
     goto except;
 
   for (i = 0; i < accepted_candidates->len; i++)
