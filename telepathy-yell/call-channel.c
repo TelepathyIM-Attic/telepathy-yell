@@ -668,8 +668,7 @@ tpy_call_channel_class_init (TpyCallChannelClass *klass)
   /**
    * TpyCallChannel::members-changed
    * @self: the #TpyCallChannel
-   * @state: the new #TpyCallState
-   * @flags: the new #TpyCallFlags
+   * @members: the call members
    *
    * The ::members-changed signal is emitted whenever participants
    * are added, removed, or their flags change.
