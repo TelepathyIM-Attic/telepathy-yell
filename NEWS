@@ -1,3 +1,11 @@
+telepathy-yell 0.0.3 (26/05/2011)
+=================================
+
+Correctly track call members (Emilio Pozuelo Monfort)
+Fix tpy_call_content_codec_offer_offer_finish's return value (Marco Barisione)
+Don't leak the GError in codec_offer_finished_cb (Marco Barisione)
+Check the return value of functions instead of the GError (Marco Barisione)
+
 telepathy-yell 0.0.2 (20/05/2011)
 =================================
 
