@@ -117,6 +117,33 @@ enum /* signals */
 static guint _signals[LAST_SIGNAL] = { 0, };
 
 static void
+update_call_members (TpyCallChannel *self,
+    GHashTable *flags_changed,
+    const GArray *removed)
+{
+  GHashTableIter iter;
+  gpointer key, value;
+  TpHandle handle;
+  guint i;
+
+  if (flags_changed != NULL)
+    {
+      g_hash_table_iter_init (&iter, flags_changed);
+      while (g_hash_table_iter_next (&iter, &key, &value))
+        g_hash_table_insert (self->priv->members, key, value);
+    }
+
+  if (removed != NULL)
+    {
+      for (i = 0; i < removed->len; i++)
+        {
+          handle = g_array_index (removed, TpHandle, i);
+          g_hash_table_remove (self->priv->members, GUINT_TO_POINTER (handle));
+        }
+    }
+}
+
+static void
 maybe_go_to_ready (TpyCallChannel *self)
 {
   TpyCallChannelPrivate *priv = self->priv;
@@ -224,11 +251,11 @@ on_call_members_changed_cb (TpProxy *proxy,
 {
   TpyCallChannel *self = TPY_CALL_CHANNEL (proxy);
 
-  DEBUG ("Call members changed: %d members",
-      g_hash_table_size (flags_changed));
+  DEBUG ("Call members: %d changed, %d removed",
+      g_hash_table_size (flags_changed),
+      removed->len);
 
-  g_hash_table_unref (self->priv->members);
-  self->priv->members = g_hash_table_ref (flags_changed);
+  update_call_members (self, flags_changed, removed);
 
   g_signal_emit (self, _signals[MEMBERS_CHANGED], 0, self->priv->members);
 }
@@ -291,9 +318,7 @@ on_call_channel_get_all_properties_cb (TpProxy *proxy,
 
   hash_table = tp_asv_get_boxed (properties,
       "CallMembers", TPY_HASH_TYPE_CALL_MEMBER_MAP);
-  if (hash_table != NULL)
-    self->priv->members = g_boxed_copy (TPY_HASH_TYPE_CALL_MEMBER_MAP,
-        hash_table);
+  update_call_members (self, hash_table, NULL);
 
   contents = tp_asv_get_boxed (properties,
       "Contents", TP_ARRAY_TYPE_OBJECT_PATH_LIST);
@@ -338,6 +363,7 @@ tpy_call_channel_dispose (GObject *obj)
 
   tp_clear_pointer (&self->priv->contents, g_ptr_array_unref);
   tp_clear_pointer (&self->priv->details, g_hash_table_unref);
+  tp_clear_pointer (&self->priv->members, g_hash_table_unref);
 
   tp_clear_object (&self->priv->result);
 
@@ -665,6 +691,8 @@ tpy_call_channel_init (TpyCallChannel *self)
       TPY_TYPE_CALL_CHANNEL, TpyCallChannelPrivate);
 
   self->priv->contents = g_ptr_array_new_with_free_func (g_object_unref);
+
+  self->priv->members = g_hash_table_new (g_direct_hash, g_direct_equal);
 }
 
 /**
