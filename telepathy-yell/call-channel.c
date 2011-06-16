@@ -81,8 +81,6 @@ struct _TpyCallChannelPrivate
   /* Array of TpyCallContents */
   GPtrArray *contents;
 
-  GSimpleAsyncResult *result;
-
   gboolean properties_retrieved;
   gboolean ready;
 };
@@ -364,8 +362,6 @@ tpy_call_channel_dispose (GObject *obj)
   tp_clear_pointer (&self->priv->contents, g_ptr_array_unref);
   tp_clear_pointer (&self->priv->details, g_hash_table_unref);
   tp_clear_pointer (&self->priv->members, g_hash_table_unref);
-
-  tp_clear_object (&self->priv->result);
 
   G_OBJECT_CLASS (tpy_call_channel_parent_class)->dispose (obj);
 }
@@ -742,18 +738,17 @@ channel_accept_cb (TpProxy *proxy,
     gpointer user_data,
     GObject *weak_object)
 {
-  TpyCallChannel *self = TPY_CALL_CHANNEL (proxy);
+  GSimpleAsyncResult *result = user_data;
 
   if (error != NULL)
     {
       DEBUG ("Failed to accept call: %s", error->message);
 
-      g_simple_async_result_set_from_error (self->priv->result, error);
+      g_simple_async_result_set_from_error (result, error);
     }
 
-  g_simple_async_result_set_op_res_gboolean (self->priv->result, TRUE);
-  g_simple_async_result_complete (self->priv->result);
-  tp_clear_object (&self->priv->result);
+  g_simple_async_result_set_op_res_gboolean (result, TRUE);
+  g_simple_async_result_complete (result);
 }
 
 /**
@@ -773,14 +768,15 @@ tpy_call_channel_accept_async (TpyCallChannel *self,
     GAsyncReadyCallback callback,
     gpointer user_data)
 {
-  g_return_if_fail (TPY_IS_CALL_CHANNEL (self));
-  g_return_if_fail (self->priv->result == NULL);
+  GSimpleAsyncResult *result;
 
-  self->priv->result = g_simple_async_result_new (G_OBJECT (self), callback,
+  g_return_if_fail (TPY_IS_CALL_CHANNEL (self));
+
+  result = g_simple_async_result_new (G_OBJECT (self), callback,
       user_data, tpy_call_channel_accept_async);
 
   tpy_cli_channel_type_call_call_accept (TP_PROXY (self), -1,
-      channel_accept_cb, NULL, NULL, G_OBJECT (self));
+      channel_accept_cb, result, NULL, G_OBJECT (self));
 }
 
 /**
@@ -816,17 +812,16 @@ channel_hangup_cb (TpProxy *proxy,
     gpointer user_data,
     GObject *weak_object)
 {
-  TpyCallChannel *self = TPY_CALL_CHANNEL (proxy);
+  GSimpleAsyncResult *result = user_data;
 
   if (error != NULL)
     {
       DEBUG ("Failed to hang up: %s", error->message);
 
-      g_simple_async_result_set_from_error (self->priv->result, error);
+      g_simple_async_result_set_from_error (result, error);
     }
 
-  g_simple_async_result_complete (self->priv->result);
-  tp_clear_object (&self->priv->result);
+  g_simple_async_result_complete (result);
 }
 
 void
@@ -837,15 +832,16 @@ tpy_call_channel_hangup_async (TpyCallChannel *self,
     GAsyncReadyCallback callback,
     gpointer user_data)
 {
-  g_return_if_fail (TPY_IS_CALL_CHANNEL (self));
-  g_return_if_fail (self->priv->result == NULL);
+  GSimpleAsyncResult *result;
 
-  self->priv->result = g_simple_async_result_new (G_OBJECT (self), callback,
+  g_return_if_fail (TPY_IS_CALL_CHANNEL (self));
+
+  result = g_simple_async_result_new (G_OBJECT (self), callback,
       user_data, tpy_call_channel_accept_async);
 
   tpy_cli_channel_type_call_call_hangup (TP_PROXY (self), -1,
       reason, detailed_reason, message,
-      channel_hangup_cb, NULL, NULL, G_OBJECT (self));
+      channel_hangup_cb, result, NULL, G_OBJECT (self));
 }
 
 void
@@ -1044,19 +1040,19 @@ on_request_hold_cb (TpChannel *proxy,
     gpointer user_data,
     GObject *weak_object)
 {
-  TpyCallChannel *self = TPY_CALL_CHANNEL (proxy);
+  GSimpleAsyncResult *result = user_data;
 
   if (error != NULL)
     {
       DEBUG ("Failed to change hold status: %s", error->message);
 
-      g_simple_async_result_set_from_error (self->priv->result, error);
+      g_simple_async_result_set_from_error (result, error);
     }
 
-  g_simple_async_result_set_op_res_gboolean (self->priv->result,
+  g_simple_async_result_set_op_res_gboolean (result,
       error == NULL);
-  g_simple_async_result_complete (self->priv->result);
-  tp_clear_object (&self->priv->result);
+  g_simple_async_result_complete (result);
+  g_object_unref (result);
 }
 
 void
@@ -1065,13 +1061,14 @@ tpy_call_channel_held_async (TpyCallChannel *self,
     GAsyncReadyCallback callback,
     gpointer user_data)
 {
-  g_return_if_fail (TPY_IS_CALL_CHANNEL (self));
-  g_return_if_fail (self->priv->result == NULL);
+  GSimpleAsyncResult *result;
 
-  self->priv->result = g_simple_async_result_new (G_OBJECT (self), callback,
+  g_return_if_fail (TPY_IS_CALL_CHANNEL (self));
+
+  result = g_simple_async_result_new (G_OBJECT (self), callback,
       user_data, tpy_call_channel_held_async);
 
   tp_cli_channel_interface_hold_call_request_hold (TP_CHANNEL (self),
       -1, held,
-      on_request_hold_cb, NULL, NULL, G_OBJECT (self));
+      on_request_hold_cb, result, g_object_unref, G_OBJECT (self));
 }
