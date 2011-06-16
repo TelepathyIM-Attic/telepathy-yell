@@ -1001,3 +1001,77 @@ tpy_call_channel_dtmf_stop_tone (TpyCallChannel *self)
   tp_cli_channel_interface_dtmf_call_stop_tone (TP_CHANNEL (self), -1, 0,
       on_dtmf_tone_cb, "stoping tone", NULL, G_OBJECT (self));
 }
+
+gboolean
+tpy_call_channel_has_hold (TpyCallChannel *self)
+{
+  g_return_val_if_fail (TPY_IS_CALL_CHANNEL (self), FALSE);
+
+  return tp_proxy_has_interface_by_id (self,
+      TP_IFACE_QUARK_CHANNEL_INTERFACE_HOLD);
+}
+
+/**
+ * tpy_call_channel_held_finish:
+ * @self: a #TpyCallChannel
+ * @result: a #GAsyncResult
+ * @error: a #GError to fill
+ *
+ * Finishes to change the hold status of the call.
+ *
+ * Since:
+ */
+gboolean
+tpy_call_channel_held_finish (TpyCallChannel *self,
+    GAsyncResult *result,
+    GError **error)
+{
+  if (g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result),
+      error))
+    return FALSE;
+
+  g_return_val_if_fail (g_simple_async_result_is_valid (result,
+      G_OBJECT (self), tpy_call_channel_held_async),
+      FALSE);
+
+  return g_simple_async_result_get_op_res_gboolean (
+    G_SIMPLE_ASYNC_RESULT (result));
+}
+
+static void
+on_request_hold_cb (TpChannel *proxy,
+    const GError *error,
+    gpointer user_data,
+    GObject *weak_object)
+{
+  TpyCallChannel *self = TPY_CALL_CHANNEL (proxy);
+
+  if (error != NULL)
+    {
+      DEBUG ("Failed to change hold status: %s", error->message);
+
+      g_simple_async_result_set_from_error (self->priv->result, error);
+    }
+
+  g_simple_async_result_set_op_res_gboolean (self->priv->result,
+      error == NULL);
+  g_simple_async_result_complete (self->priv->result);
+  tp_clear_object (&self->priv->result);
+}
+
+void
+tpy_call_channel_held_async (TpyCallChannel *self,
+    gboolean held,
+    GAsyncReadyCallback callback,
+    gpointer user_data)
+{
+  g_return_if_fail (TPY_IS_CALL_CHANNEL (self));
+  g_return_if_fail (self->priv->result == NULL);
+
+  self->priv->result = g_simple_async_result_new (G_OBJECT (self), callback,
+      user_data, tpy_call_channel_held_async);
+
+  tp_cli_channel_interface_hold_call_request_hold (TP_CHANNEL (self),
+      -1, held,
+      on_request_hold_cb, NULL, NULL, G_OBJECT (self));
+}

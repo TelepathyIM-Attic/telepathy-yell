@@ -115,6 +115,16 @@ void tpy_call_channel_dtmf_start_tone (TpyCallChannel *self,
 
 void tpy_call_channel_dtmf_stop_tone (TpyCallChannel *self);
 
+gboolean tpy_call_channel_has_hold (TpyCallChannel *self);
+
+void tpy_call_channel_held_async (TpyCallChannel *self,
+    gboolean held,
+    GAsyncReadyCallback callback,
+    gpointer user_data);
+gboolean tpy_call_channel_held_finish (TpyCallChannel *self,
+    GAsyncResult *result,
+    GError **error);
+
 G_END_DECLS
 
 #endif
