@@ -747,7 +747,7 @@ channel_accept_cb (TpProxy *proxy,
       g_simple_async_result_set_from_error (result, error);
     }
 
-  g_simple_async_result_set_op_res_gboolean (result, TRUE);
+  g_simple_async_result_set_op_res_gboolean (result, error == NULL);
   g_simple_async_result_complete (result);
 }
 
