@@ -821,6 +821,7 @@ channel_hangup_cb (TpProxy *proxy,
       g_simple_async_result_set_from_error (result, error);
     }
 
+  g_simple_async_result_set_op_res_gboolean (result, error == NULL);
   g_simple_async_result_complete (result);
 }
 
@@ -844,11 +845,21 @@ tpy_call_channel_hangup_async (TpyCallChannel *self,
       channel_hangup_cb, result, NULL, G_OBJECT (self));
 }
 
-void
+gboolean
 tpy_call_channel_hangup_finish (TpyCallChannel *self,
     GAsyncResult *result,
     GError **error)
 {
+  if (g_simple_async_result_propagate_error (G_SIMPLE_ASYNC_RESULT (result),
+      error))
+    return FALSE;
+
+  g_return_val_if_fail (g_simple_async_result_is_valid (result,
+      G_OBJECT (self), tpy_call_channel_hangup_async),
+      FALSE);
+
+  return g_simple_async_result_get_op_res_gboolean (
+      G_SIMPLE_ASYNC_RESULT (result));
 }
 
 TpyCallState

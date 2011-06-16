@@ -75,7 +75,7 @@ void tpy_call_channel_hangup_async (TpyCallChannel *self,
     GAsyncReadyCallback callback,
     gpointer user_data);
 
-void tpy_call_channel_hangup_finish (TpyCallChannel *self,
+gboolean tpy_call_channel_hangup_finish (TpyCallChannel *self,
     GAsyncResult *result,
     GError **error);
 
