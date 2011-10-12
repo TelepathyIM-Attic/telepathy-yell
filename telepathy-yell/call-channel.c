@@ -289,6 +289,7 @@ on_call_channel_get_all_properties_cb (TpProxy *proxy,
     GObject *weak_object)
 {
   TpyCallChannel *self = TPY_CALL_CHANNEL (proxy);
+  GSimpleAsyncResult *result = user_data;
   GHashTable *hash_table;
   GPtrArray *contents;
   guint i;
@@ -296,7 +297,8 @@ on_call_channel_get_all_properties_cb (TpProxy *proxy,
   if (error != NULL)
     {
       g_warning ("Could not get the channel properties: %s", error->message);
-      return;
+      g_simple_async_result_set_from_error (result, error);
+      goto out;
     }
 
   self->priv->state = tp_asv_get_uint32 (properties,
@@ -338,7 +340,10 @@ on_call_channel_get_all_properties_cb (TpProxy *proxy,
       if (content == NULL)
         {
           g_warning ("Could not create a CallContent for path %s", content_path);
-          return;
+
+          g_simple_async_result_set_error (result, TP_ERRORS, TP_ERROR_CONFUSED,
+              "Could not create a CallContent for path %s", content_path);
+          goto out;
         }
 
       g_ptr_array_add (self->priv->contents, content);
@@ -352,6 +357,12 @@ on_call_channel_get_all_properties_cb (TpProxy *proxy,
   self->priv->properties_retrieved = TRUE;
 
   maybe_go_to_ready (self);
+
+out:
+  /* TODO; ideally we should get rid of the ready property and complete once
+   * all the contents have been prepared. Or maybe that should be another
+   * feature? */
+  g_simple_async_result_complete (result);
 }
 
 static void
@@ -415,25 +426,17 @@ tpy_call_channel_get_property (GObject *object,
 }
 
 static void
-tpy_call_channel_constructed (GObject *obj)
+tpy_call_channel_prepare_core_async (TpProxy *proxy,
+    const TpProxyFeature *feature,
+    GAsyncReadyCallback callback,
+    gpointer user_data)
 {
-  TpyCallChannel *self = (TpyCallChannel *) obj;
-  TpChannel *chan = (TpChannel *) obj;
+  TpyCallChannel *self = (TpyCallChannel *) proxy;
+  GSimpleAsyncResult *result;
   GError *err = NULL;
 
-  ((GObjectClass *) tpy_call_channel_parent_class)->constructed (obj);
-
-  if (tp_channel_get_channel_type_id (chan) !=
-      TPY_IFACE_QUARK_CHANNEL_TYPE_CALL)
-    {
-      GError error = { TP_DBUS_ERRORS, TP_DBUS_ERROR_INCONSISTENT,
-          "Channel is not a Call" };
-
-      DEBUG ("Channel is not a Call: %s", tp_channel_get_channel_type (chan));
-
-      tp_proxy_invalidate (TP_PROXY (self), &error);
-      return;
-    }
+  result = g_simple_async_result_new ((GObject *) proxy, callback, user_data,
+      tpy_call_channel_prepare_core_async);
 
   tpy_cli_channel_type_call_connect_to_content_added (TP_PROXY (self),
       on_content_added_cb, NULL, NULL, NULL, &err);
@@ -443,8 +446,7 @@ tpy_call_channel_constructed (GObject *obj)
       g_critical ("Failed to connect to ContentAdded signal: %s",
           err->message);
 
-      g_error_free (err);
-      return;
+      goto failed;
     }
 
   tpy_cli_channel_type_call_connect_to_content_removed (TP_PROXY (self),
@@ -455,8 +457,7 @@ tpy_call_channel_constructed (GObject *obj)
       g_critical ("Failed to connect to ContentRemoved signal: %s",
           err->message);
 
-      g_error_free (err);
-      return;
+      goto failed;
     }
 
   tpy_cli_channel_type_call_connect_to_call_state_changed (TP_PROXY (self),
@@ -467,8 +468,7 @@ tpy_call_channel_constructed (GObject *obj)
       g_critical ("Failed to connect to CallStateChanged signal: %s",
           err->message);
 
-      g_error_free (err);
-      return;
+      goto failed;
     }
 
   tpy_cli_channel_type_call_connect_to_call_members_changed (TP_PROXY (self),
@@ -479,24 +479,56 @@ tpy_call_channel_constructed (GObject *obj)
       g_critical ("Failed to connect to CallMembersChanged signal: %s",
           err->message);
 
-      g_error_free (err);
-      return;
+      goto failed;
     }
 
   tp_cli_dbus_properties_call_get_all (self, -1,
       TPY_IFACE_CHANNEL_TYPE_CALL,
-      on_call_channel_get_all_properties_cb, NULL, NULL, NULL);
+      on_call_channel_get_all_properties_cb, result, g_object_unref, NULL);
+
+  return;
+
+failed:
+  g_simple_async_result_take_error (result, err);
+  g_simple_async_result_complete_in_idle (result);
+  g_object_unref (result);
+}
+
+enum {
+    FEAT_CORE,
+    N_FEAT
+};
+
+static const TpProxyFeature *
+tpy_call_channel_list_features (TpProxyClass *cls G_GNUC_UNUSED)
+{
+  static TpProxyFeature features[N_FEAT + 1] = { { 0 } };
+
+  if (G_LIKELY (features[0].name != 0))
+    return features;
+
+  features[FEAT_CORE].name = TPY_CALL_CHANNEL_FEATURE_CORE;
+  features[FEAT_CORE].prepare_async =
+    tpy_call_channel_prepare_core_async;
+  features[FEAT_CORE].core = TRUE;
+
+  /* assert that the terminator at the end is there */
+  g_assert (features[N_FEAT].name == 0);
+
+  return features;
 }
 
 static void
 tpy_call_channel_class_init (TpyCallChannelClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  TpProxyClass *proxy_class = (TpProxyClass *) klass;
   GParamSpec *param_spec;
 
-  gobject_class->constructed = tpy_call_channel_constructed;
   gobject_class->get_property = tpy_call_channel_get_property;
   gobject_class->dispose = tpy_call_channel_dispose;
+
+  proxy_class->list_features = tpy_call_channel_list_features;
 
   g_type_class_add_private (klass, sizeof (TpyCallChannelPrivate));
 
@@ -1082,4 +1114,19 @@ tpy_call_channel_held_async (TpyCallChannel *self,
   tp_cli_channel_interface_hold_call_request_hold (TP_CHANNEL (self),
       -1, held,
       on_request_hold_cb, result, g_object_unref, G_OBJECT (self));
+}
+
+/**
+ * TPY_CALL_CHANNEL_FEATURE_CORE:
+ *
+ * Expands to a call to a function that returns a quark for the "core"
+ * feature on a #TpyCallChannel.
+ *
+ * One can ask for a feature to be prepared using the tp_proxy_prepare_async()
+ * function, and waiting for it to trigger the callback.
+ */
+GQuark
+tpy_call_channel_get_feature_core (void)
+{
+  return g_quark_from_static_string ("tpy-call-channel-feature-core");
 }

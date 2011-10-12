@@ -55,6 +55,10 @@ struct _TpyCallChannelClass
 
 GType tpy_call_channel_get_type (void);
 
+#define TPY_CALL_CHANNEL_FEATURE_CORE \
+  tpy_call_channel_get_feature_core ()
+GQuark tpy_call_channel_get_feature_core (void) G_GNUC_CONST;
+
 TpyCallChannel *tpy_call_channel_new (TpConnection *conn,
     const gchar *object_path,
     const GHashTable *immutable_properties,
