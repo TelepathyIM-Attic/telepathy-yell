@@ -31,6 +31,7 @@
 /telepathy-yell/*.pc
 /telepathy-yell/extensions.html
 /stamp-h1
+Android.mk
 Makefile
 Makefile.in
 _gen

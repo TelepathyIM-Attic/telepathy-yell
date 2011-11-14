@@ -193,3 +193,14 @@ _gen/svc-%.c _gen/svc-%.h: _gen/%.xml \
 		--not-implemented-func='tp_dbus_g_method_return_not_implemented' \
 		--allow-unstable \
 		$< Tpy_Svc_
+
+Android.mk: Makefile.am $(BUILT_SOURCES)
+	androgenizer -:PROJECT telepathy-yell -:SHARED telepathy-yell -:TAGS eng debug \
+	 -:REL_TOP $(top_srcdir) -:ABS_TOP $(abs_top_srcdir) \
+	 -:SOURCES $(libtelepathy_yell_la_SOURCES) \
+	  $(nodist_libtelepathy_yell_la_SOURCES) \
+	 -:CFLAGS $(DEFS) $(CFLAGS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	  $(AM_CFLAGS) \
+	 -:CPPFLAGS $(CPPFLAGS) $(AM_CPPFLAGS) \
+	 -:LDFLAGS $(libtelepathy_yell_la_LIBADD) \
+	> $@

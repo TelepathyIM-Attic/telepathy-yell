@@ -108,7 +108,8 @@ AC_ARG_ENABLE(shared-library,
 AM_CONDITIONAL(ENABLE_SHARED_LIBRARY, test "x$ENABLE_SHARED_LIBRARY" != "xno")
 
 dnl Check for Glib
-PKG_CHECK_MODULES(GLIB, [glib-2.0 >= 2.28, gobject-2.0 >= 2.26, gio-2.0 >= 2.28])
+PKG_CHECK_MODULES(GLIB,
+    [glib-2.0 >= 2.28, gobject-2.0 >= 2.26, gio-2.0 >= 2.28, gio-2.0 >= 2.28])
 
 AC_SUBST(GLIB_CFLAGS)
 AC_SUBST(GLIB_LIBS)
