@@ -79,7 +79,7 @@ extern "C" {
  */
 """)
 
-        self.write("typedef enum {\n")
+        self.write("typedef enum /*< flags >*/ {\n")
 
         for flag in get_by_path(flags, 'flag'):
             self.do_val(flag, value_prefix)
@@ -123,7 +123,7 @@ extern "C" {
 
         self.d("""\
 /**
- * NUM_%(upper-plural)s:
+ * NUM_%(upper-plural)s: (skip)
  *
  * 1 higher than the highest valid value of #%(mixed-name)s.
  */
