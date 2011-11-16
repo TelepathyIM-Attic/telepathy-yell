@@ -113,7 +113,7 @@ tpy_base_call_stream_finalize (GObject *object)
 
   /* free any data held directly by the object here */
   g_free (priv->object_path);
-  g_hash_table_destroy (priv->remote_members);
+  g_hash_table_unref (priv->remote_members);
 
   if (G_OBJECT_CLASS (tpy_base_call_stream_parent_class)->finalize != NULL)
     G_OBJECT_CLASS (tpy_base_call_stream_parent_class)->finalize (object);
@@ -380,7 +380,7 @@ tpy_base_call_stream_remove_member (TpyBaseCallStream *self,
   tpy_svc_call_stream_emit_remote_members_changed (self, empty, removed_array);
 
   g_hash_table_unref (empty);
-  g_array_free (removed_array, TRUE);
+  g_array_unref (removed_array);
   return TRUE;
 }
 

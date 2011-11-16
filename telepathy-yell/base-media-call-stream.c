@@ -458,7 +458,7 @@ finally:
   /* Note that we only do a shallow free because we've copied the contents into
    * local_candidates. */
   if (accepted_candidates != NULL)
-    g_ptr_array_free (accepted_candidates, TRUE);
+    g_ptr_array_unref (accepted_candidates);
 }
 
 static void

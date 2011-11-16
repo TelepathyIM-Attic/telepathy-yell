@@ -221,7 +221,7 @@ tpy_base_call_channel_get_property (GObject    *object,
             }
 
           g_value_set_boxed (value, arr);
-          g_ptr_array_free (arr, TRUE);
+          g_ptr_array_unref (arr);
           break;
         }
       case PROP_HARDWARE_STREAMING:

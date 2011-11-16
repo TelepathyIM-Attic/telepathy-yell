@@ -467,7 +467,7 @@ codec_offer_finished_cb (GObject *source,
   empty = g_array_new (FALSE, FALSE, sizeof (TpHandle));
   tpy_svc_call_content_interface_media_emit_codecs_changed (self,
       priv->codec_map, empty);
-   g_array_free (empty, TRUE);
+   g_array_unref (empty);
 
 out:
   if (priv->current_offer == TPY_CALL_CONTENT_CODEC_OFFER (source))
